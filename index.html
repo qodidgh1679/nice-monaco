@@ -107,9 +107,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"DM San
 .fxinput{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--rs);padding:12px;font-size:20px;font-weight:600;color:var(--text);font-family:"DM Mono",monospace;outline:none;-webkit-appearance:none;}
 .fxinput:focus{border-color:var(--teal);}
 .fxsep{display:flex;align-items:center;padding-top:20px;font-size:20px;color:var(--text3);}
-.fxqrow{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
-.fxq{padding:8px 14px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--rs);font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;}
-.fxq:active{background:rgba(45,212,191,.1);color:var(--teal);}
 /* 환율 참고카드 - 풀폭 단일컬럼 */
 .refcard{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:13px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
 .reficon{font-size:22px;flex-shrink:0;}
@@ -893,8 +890,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"DM San
 <!-- 환율 -->
 <div class="pane" id="p14">
 <div style="font-size:18px;font-weight:600;margin-bottom:4px;">💱 환율 계산기</div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:16px;">EUR ↔ KRW 실시간</div>
-<div class="fxbox">
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px;">실시간 환율 기준</div>
+
+<div class="fxbox" style="margin-bottom:14px;">
+  <div style="font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px;margin-bottom:10px;">🇰🇷 KRW ↔ 🇪🇺 EUR</div>
   <div class="fxbig" id="fxBig">불러오는 중...</div>
   <div class="fxsub" id="fxSub">1 EUR = ? KRW</div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
@@ -906,10 +905,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:"DM San
     <div class="fxsep">⇄</div>
     <div class="fxcol"><div class="fxlabel">KRW (원)</div><input class="fxinput" id="krwIn" type="number" inputmode="decimal" placeholder="0" oninput="calcEUR()"></div>
   </div>
-  <div class="fxqrow">
-    <div class="fxq" onclick="setE(10)">€10</div><div class="fxq" onclick="setE(20)">€20</div><div class="fxq" onclick="setE(50)">€50</div><div class="fxq" onclick="setE(100)">€100</div><div class="fxq" onclick="setE(200)">€200</div><div class="fxq" onclick="setE(500)">€500</div>
+</div>
+
+<div class="fxbox">
+  <div style="font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px;margin-bottom:10px;">🇺🇸 USD ↔ 🇪🇺 EUR</div>
+  <div class="fxbig" id="fxBig2">불러오는 중...</div>
+  <div class="fxsub" id="fxSub2">1 EUR = ? USD</div>
+  <div class="fxrow">
+    <div class="fxcol"><div class="fxlabel">EUR (유로)</div><input class="fxinput" id="eurIn2" type="number" inputmode="decimal" placeholder="0" oninput="calcUSD()"></div>
+    <div class="fxsep">⇄</div>
+    <div class="fxcol"><div class="fxlabel">USD (달러)</div><input class="fxinput" id="usdIn" type="number" inputmode="decimal" placeholder="0" oninput="calcEUR2()"></div>
   </div>
 </div>
+
 <div class="sl">💡 여행 중 참고 금액</div>
 <div class="refcard"><div class="reficon">☕</div><div class="refbody"><div class="refname">카페 아이스아메리카노</div><div class="refrange">€3.5 – €5</div><div class="refkrw" id="r0">계산 중...</div></div></div>
 <div class="refcard"><div class="reficon">🍺</div><div class="refbody"><div class="refname">생맥주 1잔</div><div class="refrange">€5 – €8</div><div class="refkrw" id="r1">계산 중...</div></div></div>
@@ -1056,23 +1064,44 @@ function togglePh(hdr){
 }
 // 환율
 let fxRate=0;
+let fxRateUSD=0;
 async function loadFx(){
   try{
     const d=await(await fetch("https://open.er-api.com/v6/latest/EUR")).json();
     fxRate=d.rates.KRW;
+    fxRateUSD=d.rates.USD;
     const now=new Date();
-    document.getElementById("fxBig").textContent="₩"+Math.round(fxRate).toLocaleString();
-    document.getElementById("fxSub").textContent="1 EUR = ₩"+Math.round(fxRate).toLocaleString();
+    const fmt=n=>Math.round(n).toLocaleString('ko-KR');
+    document.getElementById("fxBig").textContent="₩"+fmt(fxRate);
+    document.getElementById("fxSub").textContent="1 EUR = ₩"+fmt(fxRate);
     document.getElementById("fxTime").textContent=now.getHours()+":"+String(now.getMinutes()).padStart(2,"0")+" 기준";
+    document.getElementById("fxBig2").textContent="$"+fxRateUSD.toFixed(4);
+    document.getElementById("fxSub2").textContent="1 EUR = $"+fxRateUSD.toFixed(4);
     [[0,4,5],[1,5,8],[2,15,30],[3,35,60],[4,17,17],[5,1500,2000]].forEach(([id,lo,hi])=>{
       const el=document.getElementById("r"+id);if(!el)return;
-      el.textContent=lo===hi?"≈ ₩"+Math.round(lo*fxRate).toLocaleString():"₩"+Math.round(lo*fxRate).toLocaleString()+"~₩"+Math.round(hi*fxRate).toLocaleString();
+      el.textContent=lo===hi?"≈ ₩"+fmt(lo*fxRate):"₩"+fmt(lo*fxRate)+"~₩"+fmt(hi*fxRate);
     });
   }catch(e){document.getElementById("fxBig").textContent="오류";}
 }
-function calcKRW(){const e=parseFloat(document.getElementById("eurIn").value)||0;if(fxRate)document.getElementById("krwIn").value=e?Math.round(e*fxRate):"";}
-function calcEUR(){const k=parseFloat(document.getElementById("krwIn").value)||0;if(fxRate)document.getElementById("eurIn").value=k?(k/fxRate).toFixed(2):"";}
-function setE(v){document.getElementById("eurIn").value=v;calcKRW();}
+function calcKRW(){
+  const e=parseFloat(document.getElementById("eurIn").value)||0;
+  if(fxRate){
+    const v=e?Math.round(e*fxRate):"";
+    document.getElementById("krwIn").value=v;
+  }
+}
+function calcEUR(){
+  const k=parseFloat(document.getElementById("krwIn").value)||0;
+  if(fxRate) document.getElementById("eurIn").value=k?(k/fxRate).toFixed(2):"";
+}
+function calcUSD(){
+  const e=parseFloat(document.getElementById("eurIn2").value)||0;
+  if(fxRateUSD) document.getElementById("usdIn").value=e?(e*fxRateUSD).toFixed(2):"";
+}
+function calcEUR2(){
+  const u=parseFloat(document.getElementById("usdIn").value)||0;
+  if(fxRateUSD) document.getElementById("eurIn2").value=u?(u/fxRateUSD).toFixed(2):"";
+}
 // 날씨
 const WX={nice:{lat:43.7102,lon:7.2620,name:"니스",em:"🌊"},monaco:{lat:43.7384,lon:7.4246,name:"모나코",em:"🎰"}};
 let wxCity="nice",wxCache={};
