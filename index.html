@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>니스 & 모나코 여행</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--bg2:#161616;--bg3:#202020;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--text:#f0f0f0;--text2:#888;--text3:#444;--accent:#e8d5a3;--teal:#2dd4bf;--amber:#fbbf24;--green:#4ade80;--blue:#60a5fa;--red:#f87171;--purple:#a78bfa;--r:14px;--rs:10px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;overflow:hidden;}
+.app{display:flex;flex-direction:column;height:100dvh;}
+/* Header */
+.hdr{padding:52px 18px 14px;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;}
+.hdr-row{display:flex;align-items:center;justify-content:space-between;}
+.hdr-title{font-size:22px;font-weight:600;letter-spacing:-0.5px;}
+.hdr-sub{font-size:11px;color:var(--text2);margin-top:2px;font-family:"DM Mono",monospace;}
+.badge{background:var(--accent);color:#1a1200;font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;}
+/* Date tab bar - 가로 스크롤 OK (날짜 탭은 스크롤 필요) */
+.datebar{display:flex;gap:6px;padding:10px 18px;overflow-x:auto;scrollbar-width:none;background:var(--bg);border-bottom:0.5px solid var(--border);flex-shrink:0;}
+.datebar::-webkit-scrollbar{display:none;}
+.dtab{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:0.5px solid var(--border);color:var(--text2);cursor:pointer;white-space:nowrap;background:transparent;}
+.dtab.on{background:var(--accent);color:#1a1200;border-color:transparent;font-weight:600;}
+/* Body - 가로 스크롤 절대 금지 */
+.body{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px 18px 32px;}
+.pane{display:none;}
+.pane.on{display:block;}
+/* 섹션 라벨 */
+.sl{font-size:11px;font-weight:600;letter-spacing:.7px;color:var(--text3);text-transform:uppercase;margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+.sl::after{content:"";flex:1;height:.5px;background:var(--border);}
+/* 카드 - 무조건 풀폭 단일 컬럼 */
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;width:100%;display:block;}
+.card:active{background:var(--bg3);}
+.card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;}
+.ci{font-size:24px;flex-shrink:0;margin-top:1px;}
+.cb{flex:1;min-width:0;}
+.cn{font-size:15px;font-weight:600;color:var(--text);line-height:1.3;}
+.cd{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.5;}
+/* 메타 */
+.meta{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.mr{display:flex;flex-wrap:wrap;gap:5px;}
+.mh{font-size:11px;font-family:"DM Mono",monospace;color:var(--text3);background:var(--bg3);border-radius:6px;padding:3px 8px;}
+.mp{font-size:11px;font-weight:600;color:var(--green);background:rgba(74,222,128,.09);border:0.5px solid rgba(74,222,128,.2);border-radius:6px;padding:3px 8px;}
+.mt{font-size:11px;color:var(--amber);background:rgba(251,191,36,.07);border:0.5px solid rgba(251,191,36,.15);border-radius:6px;padding:4px 9px;line-height:1.5;width:100%;}
+/* 태그 */
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.tag{font-size:10px;font-weight:500;padding:3px 9px;border-radius:8px;}
+.tw{background:rgba(45,212,191,.12);color:var(--teal);}
+.tb{background:rgba(96,165,250,.12);color:var(--blue);}
+.tr{background:rgba(248,113,113,.12);color:var(--red);}
+.ta{background:rgba(251,191,36,.12);color:var(--amber);}
+.tm{background:rgba(167,139,250,.12);color:var(--purple);}
+.tn{background:rgba(255,255,255,.07);color:var(--text2);}
+/* 버튼 */
+.btns{display:flex;gap:8px;width:100%;}
+.bm{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:11px 0;background:rgba(45,212,191,.1);border:0.5px solid rgba(45,212,191,.25);border-radius:var(--rs);cursor:pointer;}
+.bm span{font-size:12px;font-weight:600;color:var(--teal);}
+.bu{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:11px 0;background:rgba(255,255,255,.06);border:0.5px solid rgba(255,255,255,.1);border-radius:var(--rs);cursor:pointer;}
+.bu span{font-size:12px;font-weight:600;color:var(--text2);}
+/* 숙소 배너 */
+.hbanner{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:14px 15px;margin-bottom:16px;}
+.hbn{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.hbd{font-size:11px;font-family:"DM Mono",monospace;color:var(--amber);margin-bottom:2px;}
+.hbs{font-size:11px;color:var(--text3);margin-bottom:10px;}
+/* 알림 */
+.alert{background:rgba(248,113,113,.08);border:0.5px solid rgba(248,113,113,.2);border-radius:var(--r);padding:13px 14px;margin-bottom:14px;}
+.at{font-size:12px;font-weight:600;color:var(--red);margin-bottom:5px;}
+.ab{font-size:12px;color:var(--text2);line-height:1.7;}
+.info{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;}
+.it{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:5px;}
+.ib{font-size:12px;color:var(--text2);line-height:1.7;}
+/* 지역 필터탭 - 가로 스크롤 OK */
+.ftabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+.ftabs::-webkit-scrollbar{display:none;}
+.ftab{flex-shrink:0;padding:7px 15px;border-radius:20px;font-size:12px;font-weight:500;border:0.5px solid var(--border);color:var(--text2);cursor:pointer;white-space:nowrap;background:transparent;}
+.ftab.on{background:var(--accent);color:#1a1200;border-color:transparent;font-weight:600;}
+.fp{display:none;}
+.fp.on{display:block;}
+/* 루트박스 */
+.rbox{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:14px;margin-bottom:12px;}
+.rbt{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:11px;}
+.rs{display:flex;gap:10px;margin-bottom:10px;}
+.rs:last-child{margin-bottom:0;}
+.rdot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.rd1{background:rgba(96,165,250,.15);color:var(--blue);}
+.rd2{background:rgba(74,222,128,.15);color:var(--green);}
+.rd3{background:rgba(251,191,36,.15);color:var(--amber);}
+.rd4{background:rgba(167,139,250,.15);color:var(--purple);}
+.rn{font-size:13px;font-weight:500;color:var(--text);}
+.rno{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4;}
+/* 숙소카드 */
+.hcard{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;}
+.hct{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;}
+.hcn{font-size:14px;font-weight:600;color:var(--text);}
+.hcdate{font-size:11px;font-family:"DM Mono",monospace;color:var(--amber);}
+.hcstar{font-size:11px;color:var(--text3);margin-bottom:5px;}
+.hcnote{font-size:12px;color:var(--text2);line-height:1.4;margin-bottom:10px;}
+/* 환율 */
+.fxbox{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:16px;margin-bottom:12px;}
+.fxbig{font-size:28px;font-weight:700;color:var(--accent);letter-spacing:-1px;}
+.fxsub{font-size:12px;color:var(--text2);margin-top:3px;}
+.fxrow{display:flex;gap:10px;margin:14px 0;}
+.fxcol{flex:1;}
+.fxlabel{font-size:11px;color:var(--text2);margin-bottom:5px;font-family:"DM Mono",monospace;}
+.fxinput{width:100%;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--rs);padding:12px;font-size:20px;font-weight:600;color:var(--text);font-family:"DM Mono",monospace;outline:none;-webkit-appearance:none;}
+.fxinput:focus{border-color:var(--teal);}
+.fxsep{display:flex;align-items:center;padding-top:20px;font-size:20px;color:var(--text3);}
+.fxqrow{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
+.fxq{padding:8px 14px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--rs);font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;}
+.fxq:active{background:rgba(45,212,191,.1);color:var(--teal);}
+/* 환율 참고카드 - 풀폭 단일컬럼 */
+.refcard{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:13px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.reficon{font-size:22px;flex-shrink:0;}
+.refbody{flex:1;}
+.refname{font-size:13px;font-weight:500;color:var(--text);}
+.refrange{font-size:11px;color:var(--text2);margin-top:2px;}
+.refkrw{font-size:13px;font-weight:600;color:var(--teal);margin-top:3px;}
+/* 날씨 */
+.wxtabs{display:flex;gap:7px;margin-bottom:14px;}
+.wxtab{flex:1;padding:9px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rs);font-size:12px;font-weight:500;color:var(--text2);text-align:center;cursor:pointer;}
+.wxtab.on{background:rgba(45,212,191,.1);border-color:rgba(45,212,191,.3);color:var(--teal);font-weight:600;}
+.wxhero{background:linear-gradient(135deg,rgba(45,212,191,.07),rgba(96,165,250,.04));border:0.5px solid var(--border2);border-radius:var(--r);padding:20px;margin-bottom:10px;text-align:center;}
+.wxcity{font-size:11px;font-weight:600;letter-spacing:1px;color:var(--text2);text-transform:uppercase;margin-bottom:8px;}
+.wxbig{font-size:56px;line-height:1;margin-bottom:6px;}
+.wxtemp{font-size:46px;font-weight:700;color:var(--text);letter-spacing:-2px;}
+.wxfeel{font-size:12px;color:var(--text2);margin-top:4px;}
+.wxdesc{font-size:14px;color:var(--text2);margin-top:6px;}
+.wxgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.wxstat{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rs);padding:11px;text-align:center;}
+.wxsl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.wxsv{font-size:16px;font-weight:600;color:var(--text);}
+/* 날씨 예보 - 이건 가로 스크롤 OK (7일 예보라 필요) */
+.wxfc{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px;}
+.wxfc::-webkit-scrollbar{display:none;}
+.wxday{flex-shrink:0;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rs);padding:10px 13px;text-align:center;min-width:68px;}
+.wxdn{font-size:11px;color:var(--text2);margin-bottom:4px;}
+.wxdi{font-size:22px;margin-bottom:4px;}
+.wxdh{font-size:13px;font-weight:600;color:var(--text);}
+.wxdl{font-size:11px;color:var(--text3);}
+.wxdr{font-size:10px;color:var(--blue);margin-top:2px;}
+.wxmsg{text-align:center;padding:30px;color:var(--text2);font-size:14px;}
+/* 비상 */
+.emcard{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:13px;cursor:pointer;}
+.emcard:active{background:var(--bg3);}
+.emicon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.emred{background:rgba(248,113,113,.12);}
+.emblue{background:rgba(96,165,250,.12);}
+.emamber{background:rgba(251,191,36,.12);}
+.emteal{background:rgba(45,212,191,.12);}
+.empur{background:rgba(167,139,250,.12);}
+.embody{flex:1;min-width:0;}
+.emname{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;}
+.emnum{font-size:16px;font-weight:700;color:var(--accent);margin-top:2px;font-family:"DM Mono",monospace;}
+.emnote{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4;}
+.emcall{width:40px;height:40px;border-radius:50%;background:rgba(74,222,128,.12);border:0.5px solid rgba(74,222,128,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+/* 회화 */
+.phcat{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:8px;}
+.phhdr{display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;}
+.phhdr:active{background:var(--bg3);}
+.phtitle{font-size:14px;font-weight:600;color:var(--text);}
+.phchev{font-size:12px;color:var(--text3);transition:transform .2s;}
+.phchev.open{transform:rotate(180deg);}
+.phlist{display:none;border-top:0.5px solid var(--border);}
+.phlist.open{display:block;}
+.phitem{padding:12px 14px;border-bottom:0.5px solid var(--border);}
+.phitem:last-child{border-bottom:none;}
+.phkr{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.phfr{font-size:14px;font-weight:600;color:var(--teal);margin-bottom:2px;}
+.phpron{font-size:11px;color:var(--text2);font-style:italic;}
+/* 하단 네비 - 가로 스크롤 OK */
+.bnav{display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;background:var(--bg);border-top:0.5px solid var(--border);padding:6px 10px 28px;flex-shrink:0;gap:2px;-webkit-overflow-scrolling:touch;}
+.bnav::-webkit-scrollbar{display:none;}
+.nb{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 14px;cursor:pointer;border:none;background:transparent;border-radius:12px;flex-shrink:0;min-width:58px;}
+.nb:active{background:var(--bg3);}
+.nbi{font-size:22px;}
+.nbl{font-size:10px;color:var(--text2);font-weight:500;white-space:nowrap;}
+.nb.on{background:rgba(232,213,163,.08);}
+.nb.on .nbl{color:var(--accent);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr">
+  <div class="hdr-row">
+    <div><div class="hdr-title">니스 & 모나코 🇫🇷</div><div class="hdr-sub">JUN 02 – JUN 09, 2026 · 2인</div></div>
+    <div class="badge" id="dbadge">D-4</div>
+  </div>
+</div>
+<div class="datebar" id="datebar">
+  <div class="dtab on" onclick="go(0)">6/2 화</div>
+  <div class="dtab" onclick="go(1)">6/3 수</div>
+  <div class="dtab" onclick="go(2)">6/4 목</div>
+  <div class="dtab" onclick="go(3)">6/5 금</div>
+  <div class="dtab" onclick="go(4)">6/6 토🏎</div>
+  <div class="dtab" onclick="go(5)">6/7 일</div>
+  <div class="dtab" onclick="go(6)">6/8 월</div>
+  <div class="dtab" onclick="go(7)">6/9 화</div>
+  <div class="dtab" onclick="go(8)">칸·앙티브</div>
+</div>
+<div class="body" id="body">
+<div class="pane on" id="p0">
+<div class="hbanner">
+  <div class="hbn">Maison Albar – Le Victoria</div>
+  <div class="hbd">6/2 – 6/4 · 체크인 PM 4:00</div>
+  <div class="hbs">⭐⭐⭐⭐⭐ 프로므나드 해변 바로 앞</div>
+  <div class="btns"><div class="bm" onclick="gm('Maison Albar Le Victoria Nice')"><span>📍 숙소</span></div><div class="bu" onclick="ub(43.6946,7.2668,'Maison Albar')"><span>🚗 우버</span></div></div>
+</div>
+<div class="alert"><div class="at">✈️ 도착일 — 공항 PM 2:00</div><div class="ab">공항 → 호텔 택시 15분 or 트램 2호선<br>체크인 PM 4:00 · 오늘은 가볍게 근처만</div></div>
+<div class="sl">☕ 공항→호텔 가는 길 카페</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">HUG Café</div><div class="cd">길목 위치. 아이스아메리카노·크루아상.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 07:30~20:00</span><span class="mp">💶 €3.5~5</span></div><div class="mr"><span class="mt">💡 영어 가능.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('HUG Cafe 2 Rue de Suisse Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7036,7.2657,'HUG Café Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">스타벅스 장메드생</div><div class="cd">매일 08:00~. 아이스아메리카노 확실.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:00~21:00</span><span class="mp">💶 €5~7</span></div><div class="mr"><span class="mt">💡 영어 OK.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span><span class="tag tn">스벅</span></div><div class="btns"><div class="bm" onclick="gm('Starbucks 30 Avenue Jean Medecin Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7018,7.2674,'Starbucks Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🏛 체크인 후 근처 볼거리</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏛</div><div class="cb"><div class="cn">Villa Masséna 박물관</div><div class="cd">호텔 도보 5분. 나폴레옹 시대 빌라.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 10:00~18:00</span><span class="mp">💶 💶 무료입장</span></div><div class="mr"><span class="mt">💡 월요일도 오픈. 18시 정각 마감.</span></div></div><div class="btns"><div class="bm" onclick="gm('Villa Massena Museum Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6954,7.2589,'Villa Masséna Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🌊</div><div class="cb"><div class="cn">프로므나드 데 장글레</div><div class="cd">숙소 앞 해변. 산책·일몰 구경. 첫날 저녁 추천.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간</span><span class="mp">💶 💶 무료</span></div><div class="mr"><span class="mt">💡 자전거 대여 가능.</span></div></div><div class="btns"><div class="bm" onclick="gm('Promenade des Anglais Nice beach')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6946,7.2632,'Promenade des Anglais')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍽 저녁 식당 + 🍺 생맥주</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Bocca Mar</div><div class="cd">해변 바로 앞 비치 레스토랑. 지중해 요리.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~17:00 런치, 저녁 시즌운영</span><span class="mp">💶 €25~40 / 1인</span></div><div class="mr"><span class="mt">💡 생맥주 가능. 예약 권장.</span></div></div><div class="tags"><span class="tag tw">워크인</span><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Bocca Mar Nice 15 Promenade des Anglais')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6945,7.2632,'Bocca Mar Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Terrasse (대안)</div><div class="cd">르 메리디앙 호텔 9층 루프탑. 지중해 파노라마.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~22:00</span><span class="mp">💶 €25~45 / 1인</span></div><div class="mr"><span class="mt">💡 예약 권장. 뷰 최고.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('La Terrasse Nice Promenade des Anglais')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.695,7.262,'La Terrasse Nice')"><span>🚗 우버</span></div></div>
+</div>
+</div>
+<div class="pane" id="p1">
+<div class="hbanner">
+  <div class="hbn">Maison Albar – Le Victoria</div>
+  <div class="hbd">6/2 – 6/4</div>
+  <div class="hbs">⭐⭐⭐⭐⭐ 프로므나드 앞</div>
+  <div class="btns"><div class="bm" onclick="gm('Maison Albar Le Victoria Nice')"><span>📍 숙소</span></div><div class="bu" onclick="ub(43.6946,7.2668,'Maison Albar')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">☕ 카페</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">La Claque Coffee Shop ⭐</div><div class="cd">프랑스 스페셜티 TOP10. 올드니스 골목.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:30~18:00</span><span class="mp">💶 €3~5</span></div><div class="mr"><span class="mt">💡 원두 직접 로스팅. 현금 선호.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('La Claque Coffee Shop 8 Rue du Pont Vieux Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6977,7.2763,'La Claque Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">SAVVA Coffee</div><div class="cd">이탈리안 원두. 프로므나드 근처.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~토 06:00~18:00</span><span class="mp">💶 €3~4.5</span></div><div class="mr"><span class="mt">💡 일요일 휴무.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('SAVVA Coffee Shop 105 Rue de France Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6948,7.2548,'SAVVA Coffee Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Blend Coffee & Vinyl</div><div class="cd">바이닐 레코드 + 스페셜티. 콜드브루 강추.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 목~일 08:30~18:00</span><span class="mp">💶 €3~5</span></div><div class="mr"><span class="mt">💡 월~수 휴무.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Blend Coffee Vinyl Nice 22 Rue Benoit Bunico')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6968,7.2767,'Blend Coffee Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🏛 볼거리</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🎨</div><div class="cb"><div class="cn">Marc Chagall 국립미술관 ⭐</div><div class="cd">니스 최고 미술관. 성경 테마 대작.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~월 10:00~18:00</span><span class="mp">💶 €10</span></div><div class="mr"><span class="mt">💡 화요일 휴무. 언덕 위라 택시 추천.</span></div></div><div class="btns"><div class="bm" onclick="gm('Marc Chagall National Museum Nice France')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7095,7.2702,'Musée Chagall Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏛</div><div class="cb"><div class="cn">Musée du Palais Lascaris</div><div class="cd">17세기 바로크 귀족 저택. 악기 500개 컬렉션.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~월 10:00~18:00</span><span class="mp">💶 €4</span></div><div class="mr"><span class="mt">💡 화요일 휴무.</span></div></div><div class="btns"><div class="bm" onclick="gm('Palais Lascaris Museum Nice 15 Rue Droite')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6977,7.2772,'Palais Lascaris Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🌊</div><div class="cb"><div class="cn">샤토 언덕 전망대</div><div class="cd">무료 엘리베이터. 니스 해변 360도 파노라마.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:30~20:00</span><span class="mp">💶 💶 무료</span></div><div class="mr"><span class="mt">💡 엘리베이터 무료. 걸어서도 15분.</span></div></div><div class="btns"><div class="bm" onclick="gm('Colline du Chateau Nice Castle Hill elevator')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6959,7.2797,'Colline du Château')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🛍</div><div class="cb"><div class="cn">쿠르 살레야 마켓</div><div class="cd">꽃·식료품 마켓. 올드니스 중심.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 06:00~13:00</span><span class="mp">💶 💶 무료</span></div><div class="mr"><span class="mt">💡 월요일 휴무. 일요일은 벼룩시장.</span></div></div><div class="btns"><div class="bm" onclick="gm('Cours Saleya Market Nice Old Town')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.696,7.275,'Cours Saleya Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍽 식당</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Cantine de Mémé ⭐</div><div class="cd">정통 프랑스 가정식. 재료 당일 수급. 메뉴 매일 변경.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 12:00~14:30, 19:00~22:00</span><span class="mp">💶 €20~35 / 1인</span></div><div class="mr"><span class="mt">💡 월요일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('La Cantine de Meme 5 Rue Longchamp Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6987,7.267,'La Cantine de Mémé')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🥘</div><div class="cb"><div class="cn">Chez René Socca</div><div class="cd">니스 소카 원조. 병아리콩 크레페.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 09:00~21:00</span><span class="mp">💶 €5~12 / 1인</span></div><div class="mr"><span class="mt">💡 월요일 휴무. 현금 필수.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Chez Rene Socca Nice Old Town')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.697,7.276,'Chez René Socca')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍺 생맥주</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Brasserie de Castillon ⭐</div><div class="cd">포트 리미아 항구 근처. 자체 양조. 평점 4.9.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~토 17:00~24:00</span><span class="mp">💶 €5~8 / 잔</span></div><div class="mr"><span class="mt">💡 월·화·일 휴무. 카드 OK.</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Brasserie de Castillon Nice Rue Cassini')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6991,7.2837,'Brasserie de Castillon')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Beer District Libération</div><div class="cd">탭 16종. 예약 0986797985.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 17:00~00:30</span><span class="mp">💶 €5~9 / 잔</span></div><div class="mr"><span class="mt">💡 DoubleTree 도보 5분. 카드 OK.</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Beer District Liberation Nice Place Philippe Randon')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7082,7.2613,'Beer District Libération')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Brasserie BLEUE</div><div class="cd">소규모 로컬 브루어리. 평점 4.9.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~토 16:00~23:00</span><span class="mp">💶 €5~8 / 잔</span></div><div class="mr"><span class="mt">💡 월·화·일 휴무. 자리 적음.</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Brasserie Bleue Nice Rue Defly')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7022,7.2761,'Brasserie BLEUE')"><span>🚗 우버</span></div></div>
+</div>
+</div>
+<div class="pane" id="p2">
+<div class="hbanner">
+  <div class="hbn">→ DoubleTree by Hilton Nice</div>
+  <div class="hbd">6/4 – 6/8 · 체크인 PM 2:00~</div>
+  <div class="hbs">⭐⭐⭐⭐ 니스 시내 중심</div>
+  <div class="btns"><div class="bm" onclick="gm('DoubleTree by Hilton Nice Centre Iconic')"><span>📍 숙소</span></div><div class="bu" onclick="ub(43.7059,7.2649,'DoubleTree Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="info"><div class="it">💡 오늘은 숙소 이동일</div><div class="ib">오전엔 Maison Albar 근처 즐기고, 오후에 DoubleTree 체크인. 시내 중심으로 이동!</div></div>
+<div class="sl">☕ 카페</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Maison Karlie ⭐</div><div class="cd">자체 로스팅. 아이스라테 + 마들렌.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~토 08:30~17:00</span><span class="mp">💶 €3.5~5</span></div><div class="mr"><span class="mt">💡 일·월 휴무. 소규모라 빨리 품절.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Maison Karlie Nice Rue Pastorelli')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7005,7.2701,'Maison Karlie Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">HUG Café (대안)</div><div class="cd">DoubleTree 도보 3분. 매일 오픈.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 07:30~20:00</span><span class="mp">💶 €3.5~5</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('HUG Cafe 2 Rue de Suisse Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7036,7.2657,'HUG Café Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍽 식당</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Les Sens</div><div class="cd">프랑스 요리 현대적 재해석. 3코스 28€ 가성비 최고.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~금 12:00~14:00, 19:00~22:00</span><span class="mp">💶 €28~45 / 1인</span></div><div class="mr"><span class="mt">💡 토·일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Les Sens 37 Rue Pastorelli Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7003,7.2702,'Les Sens Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Le Vingt4</div><div class="cd">피스타치오 크렘 브륄레. 와인 페어링 강추.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~금 12:00~14:30, 19:00~22:30</span><span class="mp">💶 €30~50 / 1인</span></div><div class="mr"><span class="mt">💡 토·일·월 휴무.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('Le Vingt4 24 Rue Alphonse Karr Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7003,7.2645,'Le Vingt4 Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍺 생맥주</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Beer District Libération ⭐</div><div class="cd">DoubleTree 도보 5분. 탭 16종. 매일 오픈.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 17:00~00:30</span><span class="mp">💶 €5~9 / 잔</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Beer District Liberation Nice Place Philippe Randon')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7082,7.2613,'Beer District Libération')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Brasserie de Castillon</div><div class="cd">자체 양조 크래프트. 목요일 오픈.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~토 17:00~24:00</span><span class="mp">💶 €5~8 / 잔</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Brasserie de Castillon Nice Rue Cassini')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6991,7.2837,'Brasserie de Castillon')"><span>🚗 우버</span></div></div>
+</div>
+</div>
+<div class="pane" id="p3">
+<div class="hbanner">
+  <div class="hbn">DoubleTree by Hilton Nice</div>
+  <div class="hbd">6/4 – 6/8</div>
+  <div class="hbs">⭐⭐⭐⭐ 시내 중심</div>
+  <div class="btns"><div class="bm" onclick="gm('DoubleTree by Hilton Nice Centre Iconic')"><span>📍 숙소</span></div><div class="bu" onclick="ub(43.7059,7.2649,'DoubleTree Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">☕ 카페</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">HUG Café</div><div class="cd">DoubleTree 도보 3분.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 07:30~20:00</span><span class="mp">💶 €3.5~5</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('HUG Cafe 2 Rue de Suisse Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7036,7.2657,'HUG Café Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">스타벅스 니스역</div><div class="cd">기차역 바로 옆. 테이크아웃 최적.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:00~21:00</span><span class="mp">💶 €5~7</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span><span class="tag tn">스벅</span></div><div class="btns"><div class="bm" onclick="gm('Starbucks 2 Avenue Thiers Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7052,7.2623,'Starbucks Nice Station')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🏛 볼거리</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏛</div><div class="cb"><div class="cn">아시안 아트 뮤지엄</div><div class="cd">겐조 탄게 설계. 물 위에 떠 있는 건물.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 10:00~18:00</span><span class="mp">💶 💶 무료입장</span></div><div class="mr"><span class="mt">💡 월요일 휴무.</span></div></div><div class="btns"><div class="bm" onclick="gm('Asian Arts Museum Nice 405 Promenade des Anglais')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6681,7.2161,'Asian Arts Museum')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🎨</div><div class="cb"><div class="cn">마티스 미술관</div><div class="cd">시미에즈 언덕 위. 마티스 작품 60여 점.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~월 10:00~18:00</span><span class="mp">💶 💶 무료입장</span></div><div class="mr"><span class="mt">💡 화요일 휴무.</span></div></div><div class="btns"><div class="bm" onclick="gm('Matisse Museum Nice Cimiez')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7176,7.2727,'Musée Matisse Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🌅</div><div class="cb"><div class="cn">몽 보롱 전망대</div><div class="cd">로컬만 아는 뷰포인트. 니스+모나코 방향 뷰. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간</span><span class="mp">💶 💶 무료</span></div><div class="mr"><span class="mt">💡 차·택시로 정상. 야경도 좋음.</span></div></div><div class="btns"><div class="bm" onclick="gm('Panorama Mont Boron Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6965,7.2974,'Mont Boron Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍽 식당</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Réserve de Nice</div><div class="cd">바다 위 테라스. 지중해 요리. 뷰 맛집.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~22:30</span><span class="mp">💶 €35~60 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('La Reserve de Nice 62 Boulevard Franck Pilatte')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6919,7.2909,'La Réserve de Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Maison F</div><div class="cd">항구 뷰. 수요일 라이브 뮤직. 매일 오픈.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~14:30, 19:00~22:30</span><span class="mp">💶 €25~40 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Maison F Restaurant 8 Quai des Docks Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6954,7.2859,'Maison F Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍺 생맥주</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Beer District Libération ⭐</div><div class="cd">매일 오픈. 탭 16종.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 17:00~00:30</span><span class="mp">💶 €5~9 / 잔</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Beer District Liberation Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7082,7.2613,'Beer District Libération')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Brasserie de Castillon</div><div class="cd">자체 양조. 금요일 오픈.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~토 17:00~24:00</span><span class="mp">💶 €5~8 / 잔</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Brasserie de Castillon Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6991,7.2837,'Brasserie de Castillon')"><span>🚗 우버</span></div></div>
+</div>
+</div>
+<div class="pane" id="p4">
+<div class="hbanner">
+  <div class="hbn">DoubleTree by Hilton Nice</div>
+  <div class="hbd">6/4 – 6/8 · 🏎 F1 예선 당일치기</div>
+  <div class="hbs">⭐⭐⭐⭐</div>
+  <div class="btns"><div class="bm" onclick="gm('DoubleTree by Hilton Nice Centre Iconic')"><span>📍 숙소</span></div><div class="bu" onclick="ub(43.7059,7.2649,'DoubleTree Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="alert"><div class="at">🏎 F1 예선 — 모나코 당일치기</div><div class="ab">· 여권 지참 필수<br>· 니스역 출발 (기차 25분) — 혼잡 대비 일찍<br>· 예선 종료 후 약 19:30 서킷 야간 개방 (트랙 위 걷기!)<br>· 복귀 기차 1~2시간 대기 각오</div></div>
+<div class="sl">☕ 출발 전 테이크아웃</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Maison Karlie</div><div class="cd">토요일 오픈. 아이스아메리카노 테이크아웃.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~토 08:30~17:00</span><span class="mp">💶 €3.5~5</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Maison Karlie Nice Rue Pastorelli')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7005,7.2701,'Maison Karlie')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">HUG Café (대안)</div><div class="cd">매일 07:30~. 더 일찍 출발할 때.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 07:30~20:00</span><span class="mp">💶 €3.5~5</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('HUG Cafe 2 Rue de Suisse Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7036,7.2657,'HUG Café')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🚂 이동</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🚂</div><div class="cb"><div class="cn">니스 빌 기차역</div><div class="cd">모나코행 기차. 25분. F1 주간 혼잡.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mt">💡 여권 지참. 일찍 출발.</span></div></div><div class="btns"><div class="bm" onclick="gm('Nice Ville Train Station France')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7051,7.2622,'Nice Ville Station')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏎</div><div class="cb"><div class="cn">Circuit de Monaco</div><div class="cd">F1 서킷. 예선 오후 3시 전후.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mt">💡 여권 필수.</span></div></div><div class="btns"><div class="bm" onclick="gm('Circuit de Monaco Monte Carlo Formula 1')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7345,7.4215,'Circuit de Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍽 모나코 식사 (워크인)</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Caffè Milano</div><div class="cd">항구 뷰 이탈리안. 워크인 시도.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~23:00</span><span class="mp">💶 €25~45 / 1인</span></div><div class="mr"><span class="mt">💡 F1 주간 매우 혼잡. 일찍 가기.</span></div></div><div class="tags"><span class="tag tw">워크인 시도</span></div><div class="btns"><div class="bm" onclick="gm('Caffe Milano 1 Quai Albert 1er Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7368,7.422,'Caffè Milano Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Giacomo</div><div class="cd">런치 29€ 세트 (와인+커피 포함). 가성비 최고.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~15:00, 19:00~23:00</span><span class="mp">💶 €20~35 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Giacomo Monaco Boulevard du Larvotto')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7472,7.4349,'Giacomo Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍺 니스 복귀 후</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Brasserie de Castillon ⭐</div><div class="cd">토요일 오픈. F1 예선 얘기하며 마무리.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~토 17:00~24:00</span><span class="mp">💶 €5~8 / 잔</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Brasserie de Castillon Nice Rue Cassini')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6991,7.2837,'Brasserie de Castillon')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Beer District Libération (대안)</div><div class="cd">매일 오픈. 탭 16종.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 17:00~00:30</span><span class="mp">💶 €5~9 / 잔</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Beer District Liberation Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7082,7.2613,'Beer District Libération')"><span>🚗 우버</span></div></div>
+</div>
+</div>
+<div class="pane" id="p5">
+<div class="hbanner">
+  <div class="hbn">DoubleTree by Hilton Nice</div>
+  <div class="hbd">6/4 – 6/8 · 🌀 완전 자유일</div>
+  <div class="hbs">⭐⭐⭐⭐</div>
+  <div class="btns"><div class="bm" onclick="gm('DoubleTree by Hilton Nice Centre Iconic')"><span>📍 숙소</span></div><div class="bu" onclick="ub(43.7059,7.2649,'DoubleTree Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">☕ 카페 (일요일 오픈)</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">La Claque Coffee Shop ⭐</div><div class="cd">일요일 오픈. 스페셜티 TOP10.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:30~18:00</span><span class="mp">💶 €3~5</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('La Claque Coffee Shop Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6977,7.2763,'La Claque Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Blend Coffee & Vinyl</div><div class="cd">일요일 오픈. 콜드브루.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 목~일 08:30~18:00</span><span class="mp">💶 €3~5</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Blend Coffee Vinyl Nice 22 Rue Benoit Bunico')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6968,7.2767,'Blend Coffee Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">스타벅스 마세나</div><div class="cd">일요일 07:30~. 확실한 아아.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 07:30~21:00</span><span class="mp">💶 €5~7</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span><span class="tag tn">스벅</span></div><div class="btns"><div class="bm" onclick="gm('Starbucks 26 Rue Massena Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6972,7.2657,'Starbucks Masséna')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🛍 일요일 마켓</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🛍</div><div class="cb"><div class="cn">쿠르 살레야 벼룩마켓</div><div class="cd">일요일 = 벼룩시장. 올드니스 중심. 오전 추천.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 일 06:00~13:00</span><span class="mp">💶 💶 무료</span></div></div><div class="btns"><div class="bm" onclick="gm('Cours Saleya Market Nice Old Town')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.696,7.275,'Cours Saleya')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🏛 볼거리</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🎨</div><div class="cb"><div class="cn">마티스 미술관</div><div class="cd">일요일 오픈. 시미에즈 언덕. 무료.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~월 10:00~18:00</span><span class="mp">💶 💶 무료입장</span></div><div class="mr"><span class="mt">💡 화요일 휴무.</span></div></div><div class="btns"><div class="bm" onclick="gm('Matisse Museum Nice Cimiez')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7176,7.2727,'Musée Matisse')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏔</div><div class="cb"><div class="cn">에즈 마을 (당일치기)</div><div class="cd">해발 427m 절벽 위 중세 마을.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간 (마을)</span><span class="mp">💶 💶 무료</span></div><div class="mr"><span class="mt">💡 택시 25분. 선인장 정원 별도 €10.</span></div></div><div class="tags"><span class="tag tn">택시 25분</span></div><div class="btns"><div class="bm" onclick="gm('Eze Village France hilltop medieval')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7278,7.3617,'Èze Village')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍽 식당</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Cantine de Mémé</div><div class="cd">일요일 오픈. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 12:00~14:30, 19:00~22:00</span><span class="mp">💶 €20~35 / 1인</span></div><div class="mr"><span class="mt">💡 월요일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('La Cantine de Meme 5 Rue Longchamp Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6987,7.267,'La Cantine de Mémé')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Bocca Mar (대안)</div><div class="cd">일요일 오픈. 해변 뷰.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~17:00 런치</span><span class="mp">💶 €25~40 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Bocca Mar Nice Promenade des Anglais')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6945,7.2632,'Bocca Mar')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍺 생맥주</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Beer District Libération ⭐</div><div class="cd">일요일 오픈. 탭 16종.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 17:00~00:30</span><span class="mp">💶 €5~9 / 잔</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Beer District Liberation Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7082,7.2613,'Beer District Libération')"><span>🚗 우버</span></div></div>
+</div>
+</div>
+<div class="pane" id="p6">
+<div class="hbanner">
+  <div class="hbn">→ Hôtel Hermitage Monte-Carlo</div>
+  <div class="hbd">6/8 – 6/9 · 모나코 이동</div>
+  <div class="hbs">⭐⭐⭐⭐⭐ 카지노 광장 바로 옆</div>
+  <div class="btns"><div class="bm" onclick="gm('Hotel Hermitage Monte Carlo Monaco')"><span>📍 숙소</span></div><div class="bu" onclick="ub(43.7376,7.4277,'Hermitage Monte-Carlo')"><span>🚗 우버</span></div></div>
+</div>
+<div class="alert"><div class="at">🎰 카지노 입장 체크</div><div class="ab">· 여권 필수 지참<br>· 스마트 캐주얼 (반바지·운동화 입장 불가)<br>· PM 2:00 이후 게임 가능</div></div>
+<div class="sl">☕ 카페</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Casa del Caffè ⭐</div><div class="cd">카지노 광장 근처. 에스프레소 최고.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~토 07:00~19:00</span><span class="mp">💶 €4~6</span></div><div class="mr"><span class="mt">💡 일요일 휴무 주의.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Casa del Caffe Monaco Avenue de la Costa')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7392,7.4246,'Casa del Caffè Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">스타벅스 모나코 (대안)</div><div class="cd">카지노 광장 근처. 매일 08:00~.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:00~21:00</span><span class="mp">💶 €6~8</span></div><div class="mr"><span class="mt">💡 모나코 물가라 더 비쌈.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span><span class="tag tn">스벅</span></div><div class="btns"><div class="bm" onclick="gm('Starbucks Monaco Place du Casino')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7391,7.427,'Starbucks Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🎰 카지노 & 명소</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🎰</div><div class="cb"><div class="cn">Casino de Monte-Carlo</div><div class="cd">벨 에포크 건축. PM 2:00~ 게임 가능.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 14:00~새벽</span><span class="mp">💶 💶 입장 €17</span></div><div class="mr"><span class="mt">💡 여권·스마트캐주얼 필수. 오전 투어 €20.</span></div></div><div class="tags"><span class="tag tr">여권 필수</span></div><div class="btns"><div class="bm" onclick="gm('Casino de Monte Carlo Monaco Place du Casino')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7391,7.4281,'Casino de Monte-Carlo')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">👑</div><div class="cb"><div class="cn">모나코 파노라마 전망대</div><div class="cd">왕궁 옆. 항구+카지노+지중해 뷰. 평점 4.9.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간</span><span class="mp">💶 💶 무료</span></div></div><div class="btns"><div class="bm" onclick="gm('Panoramic View Monaco 32 Rue des Remparts')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7318,7.4236,'Monaco Panorama')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍽 식당</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Caffè Milano ⭐</div><div class="cd">항구 뷰. 무셀 수프·해산물 파스타 추천.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~23:00</span><span class="mp">💶 €25~45 / 1인</span></div><div class="mr"><span class="mt">💡 영어 OK. 현금·카드 모두.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Caffe Milano 1 Quai Albert 1er Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7368,7.422,'Caffè Milano Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Chez Pierre</div><div class="cd">평점 4.9. 모나코 현지인 단골.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~토 12:00~14:30, 19:00~22:00</span><span class="mp">💶 €25~40 / 1인</span></div><div class="mr"><span class="mt">💡 일요일 휴무. 프랑스어 추천.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Chez Pierre Monaco Metropole Shopping')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7406,7.4276,'Chez Pierre Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Môme Monte-Carlo</div><div class="cd">항구 뷰. 라이브 뮤직. 참치 타르타르 유명.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~23:00</span><span class="mp">💶 €40~70 / 1인</span></div><div class="mr"><span class="mt">💡 예약 2~3일 전 추천.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('La Mome Monte Carlo 7 Avenue JF Kennedy Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7372,7.424,'La Môme Monaco')"><span>🚗 우버</span></div></div>
+</div>
+</div>
+<div class="pane" id="p7">
+<div class="hbanner">
+  <div class="hbn">Hôtel Hermitage Monte-Carlo</div>
+  <div class="hbd">6/9 · 체크아웃 · 마지막 날</div>
+  <div class="hbs">⭐⭐⭐⭐⭐</div>
+  <div class="btns"><div class="bm" onclick="gm('Hotel Hermitage Monte Carlo Monaco')"><span>📍 숙소</span></div><div class="bu" onclick="ub(43.7376,7.4277,'Hermitage Monte-Carlo')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">☕ 카페</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Casa del Caffè</div><div class="cd">마지막 모나코 아침 커피.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~토 07:00~19:00</span><span class="mp">💶 €4~6</span></div><div class="mr"><span class="mt">💡 화요일이라 오픈. 에스프레소 최고.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Casa del Caffe Monaco Avenue de la Costa')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7392,7.4246,'Casa del Caffè Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🏛 볼거리</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏰</div><div class="cb"><div class="cn">모나코 왕궁</div><div class="cd">11:55 근위대 교대식. 항구 전망 최고.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 10:00~18:00</span><span class="mp">💶 €10</span></div><div class="mr"><span class="mt">💡 11:55 교대식 5분 전 도착. 6~10월 내부 개방.</span></div></div><div class="btns"><div class="bm" onclick="gm('Prince Palace Monaco Rock of Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7311,7.4203,'Prince Palace Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🐠</div><div class="cb"><div class="cn">해양박물관</div><div class="cd">세계 최고 수준. 절벽 위 건물 자체가 장관.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 10:00~18:00</span><span class="mp">💶 €22</span></div><div class="mr"><span class="mt">💡 온라인 예매 추천. 성수기 줄 김.</span></div></div><div class="btns"><div class="bm" onclick="gm('Oceanographic Museum Monaco Albert 1er')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7308,7.4256,'Musée Océanographique')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🌵</div><div class="cb"><div class="cn">이국 식물원</div><div class="cd">절벽 위 선인장 정원. 지중해 뷰.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~19:00</span><span class="mp">💶 €8</span></div><div class="mr"><span class="mt">💡 엘리베이터 있음.</span></div></div><div class="btns"><div class="bm" onclick="gm('Jardin Exotique Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7298,7.4161,'Jardin Exotique Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍽 식당</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Chez Pierre ⭐</div><div class="cd">평점 4.9. 현지인 단골. 화요일 오픈.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~토 12:00~14:30, 19:00~22:00</span><span class="mp">💶 €25~40 / 1인</span></div><div class="mr"><span class="mt">💡 일요일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Chez Pierre Monaco Metropole Shopping')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7406,7.4276,'Chez Pierre Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Caffè Milano (대안)</div><div class="cd">항구 뷰. 해산물 파스타.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~23:00</span><span class="mp">💶 €25~45 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Caffe Milano 1 Quai Albert 1er Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7368,7.422,'Caffè Milano Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🦪</div><div class="cb"><div class="cn">The Pearls of Monte-Carlo</div><div class="cd">직접 키운 굴 전문. 굴 6개 €18~. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~토 12:00~22:00</span><span class="mp">💶 €30~60 / 1인</span></div><div class="mr"><span class="mt">💡 신선도 보장. 예약 권장.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('The Pearls of Monte Carlo Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7279,7.4234,'The Pearls Monaco')"><span>🚗 우버</span></div></div>
+</div>
+</div>
+<div class="pane" id="p8">
+<div style="font-size:18px;font-weight:600;margin-bottom:4px;">칸 & 앙티브</div><div style="font-size:12px;color:var(--text2);margin-bottom:16px;">니스에서 당일치기 — 끌리는 날 아무 때나</div><div class="rbox"><div class="rbt">🗺 추천 루트 — 기차 당일치기</div>
+  <div class="rs"><div class="rdot rd1">1</div><div><div class="rn">니스 출발</div><div class="rno">니스→앙티브 30분 / 니스→칸 40분</div></div></div>
+  <div class="rs"><div class="rdot rd2">2</div><div><div class="rn">앙티브 오전</div><div class="rno">구시가지 → 피카소 미술관 → 포르 카레</div></div></div>
+  <div class="rs"><div class="rdot rd3">3</div><div><div class="rn">칸 점심~저녁</div><div class="rno">크루아제트 → 팔레 드 페스티발 → 쉬케 언덕</div></div></div>
+  <div class="rs"><div class="rdot rd4">4</div><div><div class="rn">니스 복귀</div><div class="rno">칸→니스 40분. 막차 시간 확인.</div></div></div>
+</div>
+<div class="ftabs"><div class="ftab on" id="at0" onclick="showArea(0)">📍 앙티브</div><div class="ftab" id="at1" onclick="showArea(1)">🎬 칸</div></div><div class="fp on" id="ap0"><div class="sl">🏛 볼거리</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🎨</div><div class="cb"><div class="cn">피카소 미술관</div><div class="cd">구시가지 성벽 위. 바다 뷰 + 피카소 컬렉션.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 10:00~18:00</span><span class="mp">💶 €8</span></div><div class="mr"><span class="mt">💡 월요일 휴무.</span></div></div><div class="btns"><div class="bm" onclick="gm('Musee Picasso Antibes France')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5804,7.127,'Musée Picasso Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏰</div><div class="cb"><div class="cn">포르 카레 (Fort Carré)</div><div class="cd">16세기 성채. 항구 뷰 장관.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 10:00~18:00</span><span class="mp">💶 €5</span></div><div class="mr"><span class="mt">💡 월요일 휴무.</span></div></div><div class="btns"><div class="bm" onclick="gm('Fort Carre Antibes France')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5901,7.1274,'Fort Carré Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">☕ 카페</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Healthy Lounge</div><div class="cd">아이스커피 + 브런치. 평점 4.7.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~17:00</span><span class="mp">💶 €4~7</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Healthy Lounge Antibes Rue James Close')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5806,7.1254,'Healthy Lounge Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍽 식당</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Angelo's by Le Milano ⭐</div><div class="cd">피자·파스타 최고. 영어 잘 됨. 매일 오픈.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~22:30</span><span class="mp">💶 €15~28 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Angelo by Le Milano Antibes 2 Rue de la Tourraque')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.58,7.1271,'Angelo Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Ruby's Garden</div><div class="cd">쪽갈비 유명. 아늑한 정원 테라스.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화·목~일 12:00~22:00</span><span class="mp">💶 €20~35 / 1인</span></div><div class="mr"><span class="mt">💡 월·수 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Ruby Garden Antibes 37 Rue Vauban')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5826,7.1228,'Ruby Garden Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Taille de Guêpe ⭐</div><div class="cd">아름다운 플레이팅. 오리·참치·가리비 강추.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~토 12:00~14:00, 19:00~22:00</span><span class="mp">💶 €35~55 / 1인</span></div><div class="mr"><span class="mt">💡 화·일·월 휴무. 예약 3~5일 전.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('La Taille de Guepe 24 Rue de Fersen Antibes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5803,7.125,'La Taille de Guêpe Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">⭐⭐</div><div class="cb"><div class="cn">La Cafetière Fêlée</div><div class="cd">아시아·프렌치 퓨전. 여행 중 최고 식사 평가 다수.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~금 12:00~13:30, 19:00~21:30</span><span class="mp">💶 €40~65 / 1인</span></div><div class="mr"><span class="mt">💡 토·일·월 휴무. 2주 전 예약 필수.</span></div></div><div class="tags"><span class="tag tr">예약 필수</span></div><div class="btns"><div class="bm" onclick="gm('Restaurant La Cafetiere Felee 18 Rue du Marc Antibes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5807,7.1247,'La Cafetière Fêlée')"><span>🚗 우버</span></div></div>
+</div>
+</div><div class="fp" id="ap1"><div class="sl">🏛 볼거리</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🎬</div><div class="cb"><div class="cn">팔레 드 페스티발</div><div class="cd">레드카펫 계단 + 핸드프린트. 크루아제트 옆.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간 (외부)</span><span class="mp">💶 💶 무료</span></div></div><div class="btns"><div class="bm" onclick="gm('Palais des Festivals Cannes Boulevard de la Croisette')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5508,7.018,'Palais des Festivals Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏛</div><div class="cb"><div class="cn">르 쉬케 언덕 (구시가지)</div><div class="cd">칸 전경 파노라마. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간</span><span class="mp">💶 💶 무료</span></div></div><div class="btns"><div class="bm" onclick="gm('Le Suquet Old Town Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.551,7.0105,'Le Suquet Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏛</div><div class="cb"><div class="cn">세계탐험 박물관</div><div class="cd">중세 탑 + 360도 칸 뷰.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 10:00~18:00</span><span class="mp">💶 €4.5</span></div><div class="mr"><span class="mt">💡 월요일 휴무.</span></div></div><div class="btns"><div class="bm" onclick="gm('Musee des Explorations du Monde Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5499,7.0104,'Musée Explorations Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">☕ 카페</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">AMAMO Specialty Coffee ⭐</div><div class="cd">2025 프랑스 스페셜티 1위. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~18:00</span><span class="mp">💶 €3.5~5</span></div><div class="mr"><span class="mt">💡 인기 많으니 일찍 방문.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('AMAMO Specialty Coffee 74 Rue Meynadier Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5517,7.0122,'AMAMO Coffee Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Good Mate Coffee</div><div class="cd">평점 4.6. 아이스라테 추천.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:00~17:00</span><span class="mp">💶 €3~5</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Good Mate Coffee 28 Rue Hoche Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.553,7.0214,'Good Mate Coffee Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🍽 식당</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Cantine Provençale ⭐</div><div class="cd">칸 최고 프로방스 요리. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~토 12:00~14:30, 19:00~22:30</span><span class="mp">💶 €20~35 / 1인</span></div><div class="mr"><span class="mt">💡 일요일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('La Cantine Provencale 9 Rue Bivouac Napoleon Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5521,7.0175,'La Cantine Provençale')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Medami</div><div class="cd">연어 허니 소스·트러플 파스타 강추.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~22:00</span><span class="mp">💶 €20~35 / 1인</span></div><div class="mr"><span class="mt">💡 올데이 다이닝.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Medami 30bis Rue Hoche Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.553,7.0218,'Medami Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">L'Assiette Provençale</div><div class="cd">구항구 앞. 문어구이·생선 수프 강추.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 12:00~14:30, 19:00~22:00</span><span class="mp">💶 €25~45 / 1인</span></div><div class="mr"><span class="mt">💡 월요일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('LAssiette Provencale 9 Quai Saint Pierre Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.55,7.012,'L Assiette Provençale')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍔</div><div class="cb"><div class="cn">Black Sails – Pirate Tavern ⭐</div><div class="cd">평점 4.9. 칸 최고 버거·스테이크.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~일 19:00~23:00</span><span class="mp">💶 €25~45 / 1인</span></div><div class="mr"><span class="mt">💡 월·화 휴무. 저녁만. 예약 1~2일 전.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('Black Sails Pirate Tavern 39 Rue Georges Clemenceau Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5491,7.0114,'Black Sails Cannes')"><span>🚗 우버</span></div></div>
+</div>
+</div></div>
+<div class="pane" id="p9">
+<div style="font-size:18px;font-weight:600;margin-bottom:4px;">🌿 자연경관</div><div style="font-size:12px;color:var(--text2);margin-bottom:16px;">택시 or 엘리베이터 — 걸어서 올라가는 거 없음</div><div class="sl">📍 니스</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🌊</div><div class="cb"><div class="cn">샤토 언덕 ⭐⭐</div><div class="cd">무료 엘리베이터. 니스 해변 360도 파노라마. 평점 4.7.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:30~20:00</span><span class="mp">💶 💶 무료</span></div><div class="mr"><span class="mt">💡 엘리베이터 무료.</span></div></div><div class="btns"><div class="bm" onclick="gm('Colline du Chateau Nice Castle Hill elevator')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6959,7.2797,'Colline du Château')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🌅</div><div class="cb"><div class="cn">몽 보롱 전망대</div><div class="cd">차·택시로 정상. 로컬 뷰포인트. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간</span><span class="mp">💶 💶 무료</span></div><div class="mr"><span class="mt">💡 야경도 좋음.</span></div></div><div class="tags"><span class="tag tn">택시</span></div><div class="btns"><div class="bm" onclick="gm('Panorama Mont Boron Nice Boulevard du Mont Boron')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6965,7.2974,'Mont Boron Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">📍 에즈 마을 — 택시 25분 ⭐ 강추</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏔</div><div class="cb"><div class="cn">에즈 마을 ⭐⭐</div><div class="cd">해발 427m 절벽 위 중세 마을. 지중해 전망 압도. 평점 4.7.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간 (마을)</span><span class="mp">💶 💶 무료</span></div><div class="mr"><span class="mt">💡 택시 25분. 선인장 정원 별도 €10.</span></div></div><div class="tags"><span class="tag tn">택시 25분</span></div><div class="btns"><div class="bm" onclick="gm('Eze Village France hilltop medieval')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7278,7.3617,'Èze Village')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🌵</div><div class="cb"><div class="cn">에즈 선인장 정원</div><div class="cd">에즈 마을 꼭대기. 360도 파노라마. 평점 4.7.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~19:30</span><span class="mp">💶 €10</span></div></div><div class="btns"><div class="bm" onclick="gm('Jardin Exotique Eze 20 Rue du Chateau')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7283,7.3612,'Jardin Exotique Èze')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">📍 라 튀르비 — 택시 30분 (모나코 뷰)</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🦅</div><div class="cb"><div class="cn">테트 드 시앙 ⭐⭐</div><div class="cd">해발 550m. 모나코 전체를 내려다봄. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간</span><span class="mp">💶 💶 무료</span></div><div class="mr"><span class="mt">💡 차로 정상 접근. 택시 대절.</span></div></div><div class="tags"><span class="tag tn">택시 대절</span></div><div class="btns"><div class="bm" onclick="gm('Tete de Chien La Turbie France Monaco viewpoint')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7307,7.4021,'Tête de Chien La Turbie')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🏛</div><div class="cb"><div class="cn">아우구스투스 트로피</div><div class="cd">로마 시대 유적 + 모나코 파노라마 뷰.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 10:00~13:00, 14:30~17:30</span><span class="mp">💶 €6</span></div><div class="mr"><span class="mt">💡 월요일 휴무.</span></div></div><div class="btns"><div class="bm" onclick="gm('Trophy Augustus La Turbie France')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7448,7.4018,'Trophy Augustus La Turbie')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">📍 그랑 코르니슈 ⭐ 강추</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🛣</div><div class="cb"><div class="cn">그랑 코르니슈 절벽 드라이브</div><div class="cd">해발 400m 절벽 도로. 니스→에즈→라 튀르비→모나코. 리비에라 최고의 드라이브.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간</span><span class="mp">💶 💶 택시 €150~200 반나절</span></div><div class="mr"><span class="mt">💡 택시 반나절 대절 추천. 4~5시간.</span></div></div><div class="tags"><span class="tag tn">택시 대절</span></div><div class="btns"><div class="bm" onclick="gm('Grande Corniche D2564 Nice Monaco scenic road')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7544,7.4258,'Grande Corniche')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">📍 모나코</div>
+<div class="card">
+  <div class="card-top"><div class="ci">👑</div><div class="cb"><div class="cn">모나코 파노라마 전망대</div><div class="cd">왕궁 바로 옆. 항구+카지노+지중해 뷰. 평점 4.9.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 24시간</span><span class="mp">💶 💶 무료</span></div></div><div class="btns"><div class="bm" onclick="gm('Panoramic View Monaco 32 Rue des Remparts')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7318,7.4236,'Monaco Panorama')"><span>🚗 우버</span></div></div>
+</div>
+</div>
+<div class="pane" id="p10">
+<div style="font-size:18px;font-weight:600;margin-bottom:4px;">☕ 카페 전체</div><div style="font-size:12px;color:var(--text2);margin-bottom:14px;">아이스아메리카노 기준 추천</div><div class="ftabs"><div class="ftab on" id="ct0" onclick="showCafe(0)">🌊 니스</div><div class="ftab" id="ct1" onclick="showCafe(1)">🎰 모나코</div><div class="ftab" id="ct2" onclick="showCafe(2)">🎬 칸</div></div><div class="fp on" id="cp0"><div class="sl">스페셜티</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">La Claque Coffee Shop ⭐</div><div class="cd">프랑스 스페셜티 TOP10. 올드니스.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:30~18:00</span><span class="mp">💶 €3~5</span></div><div class="mr"><span class="mt">💡 현금 선호.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('La Claque Coffee Shop 8 Rue du Pont Vieux Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6977,7.2763,'La Claque Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">HUG Café</div><div class="cd">DoubleTree 도보 3분. 크루아상 추천.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 07:30~20:00</span><span class="mp">💶 €3.5~5</span></div><div class="mr"><span class="mt">💡 영어 가능.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('HUG Cafe 2 Rue de Suisse Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7036,7.2657,'HUG Café Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Maison Karlie</div><div class="cd">자체 로스팅. 마들렌.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~토 08:30~17:00</span><span class="mp">💶 €3.5~5</span></div><div class="mr"><span class="mt">💡 일·월 휴무.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Maison Karlie Nice Rue Pastorelli')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7005,7.2701,'Maison Karlie Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Blend Coffee & Vinyl</div><div class="cd">바이닐 레코드 + 스페셜티.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 목~일 08:30~18:00</span><span class="mp">💶 €3~5</span></div><div class="mr"><span class="mt">💡 월~수 휴무.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Blend Coffee Vinyl Nice 22 Rue Benoit Bunico')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6968,7.2767,'Blend Coffee Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">SAVVA Coffee</div><div class="cd">이탈리안 원두. 이른 아침 오픈.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~토 06:00~18:00</span><span class="mp">💶 €3~4.5</span></div><div class="mr"><span class="mt">💡 일요일 휴무.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('SAVVA Coffee Shop 105 Rue de France Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6948,7.2548,'SAVVA Coffee Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">스타벅스</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">장메드생점</div><div class="cd">시내 중심. 아이스아메리카노 확실.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:00~21:00</span><span class="mp">💶 €5~7</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span><span class="tag tn">스벅</span></div><div class="btns"><div class="bm" onclick="gm('Starbucks 30 Avenue Jean Medecin Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7018,7.2674,'Starbucks Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">마세나점</div><div class="cd">올드니스 입구. 아이스아메리카노 확실.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 07:30~21:00</span><span class="mp">💶 €5~7</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span><span class="tag tn">스벅</span></div><div class="btns"><div class="bm" onclick="gm('Starbucks 26 Rue Massena Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6972,7.2657,'Starbucks Masséna')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">니스역점</div><div class="cd">기차역 바로 옆. 테이크아웃 최적.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:00~21:00</span><span class="mp">💶 €5~7</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span><span class="tag tn">스벅</span></div><div class="btns"><div class="bm" onclick="gm('Starbucks 2 Avenue Thiers Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7052,7.2623,'Starbucks Nice Station')"><span>🚗 우버</span></div></div>
+</div>
+</div><div class="fp" id="cp1"><div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Casa del Caffè ⭐</div><div class="cd">카지노 광장 근처. 에스프레소 최고.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~토 07:00~19:00</span><span class="mp">💶 €4~6</span></div><div class="mr"><span class="mt">💡 일요일 휴무 주의.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Casa del Caffe Monaco Avenue de la Costa')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7392,7.4246,'Casa del Caffè Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">스타벅스 모나코</div><div class="cd">카지노 광장 근처.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:00~21:00</span><span class="mp">💶 €6~8</span></div><div class="mr"><span class="mt">💡 모나코 물가라 더 비쌈.</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span><span class="tag tn">스벅</span></div><div class="btns"><div class="bm" onclick="gm('Starbucks Monaco Place du Casino')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7391,7.427,'Starbucks Monaco')"><span>🚗 우버</span></div></div>
+</div>
+</div><div class="fp" id="cp2"><div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">AMAMO Specialty Coffee ⭐</div><div class="cd">2025 프랑스 스페셜티 1위. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~18:00</span><span class="mp">💶 €3.5~5</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('AMAMO Specialty Coffee 74 Rue Meynadier Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5517,7.0122,'AMAMO Coffee Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">☕</div><div class="cb"><div class="cn">Good Mate Coffee</div><div class="cd">평점 4.6. 아이스라테 추천.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:00~17:00</span><span class="mp">💶 €3~5</span></div></div><div class="tags"><span class="tag ta">아아 ✓</span></div><div class="btns"><div class="bm" onclick="gm('Good Mate Coffee 28 Rue Hoche Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.553,7.0214,'Good Mate Coffee Cannes')"><span>🚗 우버</span></div></div>
+</div>
+</div></div>
+<div class="pane" id="p11">
+<div style="font-size:18px;font-weight:600;margin-bottom:4px;">🍺 생맥주 맛집</div><div style="font-size:12px;color:var(--text2);margin-bottom:16px;">니스 크래프트 브루어리 & 바</div><div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Brasserie de Castillon ⭐</div><div class="cd">포트 리미아 항구 근처. 자체 양조. 평점 4.9.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~토 17:00~24:00</span><span class="mp">💶 €5~8 / 잔</span></div><div class="mr"><span class="mt">💡 월·화·일 휴무. 카드 OK.</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Brasserie de Castillon Nice Rue Cassini')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6991,7.2837,'Brasserie de Castillon')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Beer District Libération</div><div class="cd">탭 16종. 예약 0986797985.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 17:00~00:30</span><span class="mp">💶 €5~9 / 잔</span></div><div class="mr"><span class="mt">💡 DoubleTree 도보 5분. 카드 OK.</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Beer District Liberation Nice Place Philippe Randon')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7082,7.2613,'Beer District Libération')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Brasserie BLEUE</div><div class="cd">소규모 로컬 브루어리. 평점 4.9.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~토 16:00~23:00</span><span class="mp">💶 €5~8 / 잔</span></div><div class="mr"><span class="mt">💡 월·화·일 휴무. 자리 적음.</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Brasserie Bleue Nice Rue Defly')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7022,7.2761,'Brasserie BLEUE')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍺</div><div class="cb"><div class="cn">Bocca Mar</div><div class="cd">해변 바로 앞. 식사도 가능.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~17:00 런치</span><span class="mp">💶 €25~40 / 1인</span></div><div class="mr"><span class="mt">💡 생맥주 가능. 여름 DJ 파티.</span></div></div><div class="tags"><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Bocca Mar Nice 15 Promenade des Anglais')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6945,7.2632,'Bocca Mar Nice')"><span>🚗 우버</span></div></div>
+</div>
+</div>
+<div class="pane" id="p12">
+<div style="font-size:18px;font-weight:600;margin-bottom:4px;">🍽 식당 가이드</div><div style="font-size:12px;color:var(--text2);margin-bottom:14px;">지역별 · 카테고리별 정리</div><div class="ftabs"><div class="ftab on" id="rt0" onclick="showRegion(0)">🌊 니스</div><div class="ftab" id="rt1" onclick="showRegion(1)">🎰 모나코</div><div class="ftab" id="rt2" onclick="showRegion(2)">🎬 칸</div><div class="ftab" id="rt3" onclick="showRegion(3)">🏰 앙티브</div></div><div class="fp on" id="rp0"><div class="sl">🟢 워크인 가능</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Chez Acchiardo</div><div class="cd">1930년대부터 전통 가정식. 오리·생선 요리.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~금 12:00~14:30, 19:00~22:00</span><span class="mp">💶 €18~28 / 1인</span></div><div class="mr"><span class="mt">💡 주말 휴무. 현금만. 예약 추천.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Chez Acchiardo 38 Rue Droite Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6965,7.2771,'Chez Acchiardo Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Cantine de Mémé ⭐</div><div class="cd">재료 당일 수급. 메뉴 매일 변경. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 12:00~14:30, 19:00~22:00</span><span class="mp">💶 €20~35 / 1인</span></div><div class="mr"><span class="mt">💡 월요일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('La Cantine de Meme 5 Rue Longchamp Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6987,7.267,'La Cantine de Mémé')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Bocca Mar</div><div class="cd">해변 바로 앞. 지중해 요리. 생맥주 가능.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~17:00 런치, 저녁 시즌운영</span><span class="mp">💶 €25~40 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span><span class="tag tb">생맥주</span></div><div class="btns"><div class="bm" onclick="gm('Bocca Mar Nice Promenade des Anglais')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6945,7.2632,'Bocca Mar Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Les Sens</div><div class="cd">3코스 28€. 프랑스 요리 현대적 재해석.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~금 12:00~14:00, 19:00~22:00</span><span class="mp">💶 €28~45 / 1인</span></div><div class="mr"><span class="mt">💡 토·일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Les Sens 37 Rue Pastorelli Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7003,7.2702,'Les Sens Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Maison F</div><div class="cd">항구 뷰. 수요일 라이브 뮤직. 매일 오픈.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~14:30, 19:00~22:30</span><span class="mp">💶 €25~40 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Maison F Restaurant 8 Quai des Docks Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6954,7.2859,'Maison F Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🥘</div><div class="cb"><div class="cn">Chez René Socca</div><div class="cd">니스 소카 원조. 병아리콩 크레페.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 09:00~21:00</span><span class="mp">💶 €5~12 / 1인</span></div><div class="mr"><span class="mt">💡 월요일 휴무. 현금 필수.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Chez Rene Socca Nice Old Town')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.697,7.276,'Chez René Socca')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🟡 예약 권장</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">L'Alchimie</div><div class="cd">미슐랭급 퀄리티. 버섯 라비올리·생선 요리 추천.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~토 12:00~14:00, 19:00~22:00</span><span class="mp">💶 €35~55 / 1인</span></div><div class="mr"><span class="mt">💡 저녁은 반드시 예약. 런치 워크인 가능.</span></div></div><div class="tags"><span class="tag tr">저녁 예약</span></div><div class="btns"><div class="bm" onclick="gm('L Alchimie restaurant Nice 14 Rue Maccarani')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.699,7.2645,'L Alchimie Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Le Vingt4</div><div class="cd">와인바·비스트로. 피스타치오 크렘 브륄레.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~금 12:00~14:30, 19:00~22:30</span><span class="mp">💶 €30~50 / 1인</span></div><div class="mr"><span class="mt">💡 토·일·월 휴무.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('Le Vingt4 24 Rue Alphonse Karr Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7003,7.2645,'Le Vingt4 Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">⭐ 파인다이닝 (예약 필수)</div>
+<div class="card">
+  <div class="card-top"><div class="ci">⭐</div><div class="cb"><div class="cn">Restaurant JAN</div><div class="cd">남아공 셰프의 독창적 프렌치.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~토 19:00~22:00</span><span class="mp">💶 €80~120 / 1인</span></div><div class="mr"><span class="mt">💡 예약 필수.</span></div></div><div class="tags"><span class="tag tr">예약 필수</span></div><div class="btns"><div class="bm" onclick="gm('Restaurant JAN 12 Rue Lascaris Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6999,7.2849,'Restaurant JAN Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">⭐</div><div class="cb"><div class="cn">Les Agitateurs</div><div class="cd">일·프 퓨전. 9코스 테이스팅. 미슐랭 추천.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~토 19:00~22:30</span><span class="mp">💶 €60~90 / 1인</span></div><div class="mr"><span class="mt">💡 지하 와인셀러 자리 인기. 예약 필수.</span></div></div><div class="tags"><span class="tag tr">예약 필수</span></div><div class="btns"><div class="bm" onclick="gm('Les Agitateurs 24 Rue Bonaparte Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7005,7.2843,'Les Agitateurs Nice')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">⭐⭐</div><div class="cb"><div class="cn">Flaveur — 미슐랭 2스타</div><div class="cd">형제 셰프. 9코스. 약 3~4시간.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~금 12:00~13:30, 19:00~21:30</span><span class="mp">💶 €90~150 / 1인</span></div><div class="mr"><span class="mt">💡 예약 필수.</span></div></div><div class="tags"><span class="tag tr">예약 필수</span><span class="tag tm">2스타</span></div><div class="btns"><div class="bm" onclick="gm('Flaveur 25 Rue Gubernatis Nice')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7013,7.2718,'Flaveur Nice')"><span>🚗 우버</span></div></div>
+</div>
+</div><div class="fp" id="rp1"><div class="sl">🟢 워크인 가능</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Caffè Milano ⭐</div><div class="cd">항구 뷰. 무셀 수프·해산물 파스타.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~23:00</span><span class="mp">💶 €25~45 / 1인</span></div><div class="mr"><span class="mt">💡 영어 OK.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Caffe Milano 1 Quai Albert 1er Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7368,7.422,'Caffè Milano Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Chez Pierre ⭐</div><div class="cd">평점 4.9. 모나코 현지인 단골.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~토 12:00~14:30, 19:00~22:00</span><span class="mp">💶 €25~40 / 1인</span></div><div class="mr"><span class="mt">💡 일요일 휴무. 프랑스어 추천.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Chez Pierre Monaco Metropole Shopping')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7406,7.4276,'Chez Pierre Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Giacomo</div><div class="cd">런치 29€ 세트 (와인+커피 포함). 가성비 최고.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~15:00, 19:00~23:00</span><span class="mp">💶 €20~35 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Giacomo Monaco Boulevard du Larvotto')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7472,7.4349,'Giacomo Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Marius Monaco</div><div class="cd">항구 테라스. 아이올리·스테이크 강추.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~토 12:00~14:30, 19:00~22:30</span><span class="mp">💶 €30~50 / 1인</span></div><div class="mr"><span class="mt">💡 월·일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Marius Monaco 6 Quai Antoine 1er')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7328,7.425,'Marius Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🟡 예약 권장</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Môme Monte-Carlo</div><div class="cd">항구 뷰. 라이브 뮤직. 참치 타르타르 유명.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~23:00</span><span class="mp">💶 €40~70 / 1인</span></div><div class="mr"><span class="mt">💡 예약 2~3일 전 추천.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('La Mome Monte Carlo Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7372,7.424,'La Môme Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🦪</div><div class="cb"><div class="cn">The Pearls of Monte-Carlo</div><div class="cd">직접 키운 굴 전문. 굴 6개 €18~.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~토 12:00~22:00</span><span class="mp">💶 €30~60 / 1인</span></div><div class="mr"><span class="mt">💡 신선도 보장. 예약 권장.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('The Pearls of Monte Carlo Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7279,7.4234,'The Pearls Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">⭐ 파인다이닝 (예약 필수)</div>
+<div class="card">
+  <div class="card-top"><div class="ci">⭐</div><div class="cb"><div class="cn">Pavyllon Monte-Carlo — 미슐랭 1스타</div><div class="cd">야닉 알레노 셰프. Hermitage 호텔 내.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 12:00~14:30, 19:00~22:00</span><span class="mp">💶 €80~120 / 1인</span></div><div class="mr"><span class="mt">💡 예약 필수.</span></div></div><div class="tags"><span class="tag tr">예약 필수</span><span class="tag tm">1스타</span></div><div class="btns"><div class="bm" onclick="gm('Pavyllon Monte Carlo Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7384,7.4264,'Pavyllon Monte-Carlo')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">⭐⭐</div><div class="cb"><div class="cn">Les Ambassadeurs — 미슐랭 2스타</div><div class="cd">평점 4.9. 랍스터 라자냐.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월·목~일 19:00~22:00</span><span class="mp">💶 €120~200 / 1인</span></div><div class="mr"><span class="mt">💡 화·수 휴무. 복장 규정 엄격. 예약 필수.</span></div></div><div class="tags"><span class="tag tr">예약 필수</span><span class="tag tm">2스타</span></div><div class="btns"><div class="bm" onclick="gm('Les Ambassadeurs Monaco Metropole')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7407,7.4278,'Les Ambassadeurs Monaco')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">⭐⭐⭐</div><div class="cb"><div class="cn">Le Louis XV — 미슐랭 3스타</div><div class="cd">알랭 뒤카스 플래그십. 호텔 드 파리 내.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~토 12:30~13:30, 20:00~21:30</span><span class="mp">💶 €250~400 / 1인</span></div><div class="mr"><span class="mt">💡 예약 필수. 재킷 필수.</span></div></div><div class="tags"><span class="tag tr">예약 필수</span><span class="tag tm">3스타</span></div><div class="btns"><div class="bm" onclick="gm('Le Louis XV Alain Ducasse Hotel de Paris Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7392,7.4271,'Le Louis XV Monaco')"><span>🚗 우버</span></div></div>
+</div>
+</div><div class="fp" id="rp2"><div class="sl">🟢 워크인 가능</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Cantine Provençale ⭐</div><div class="cd">칸 최고 프로방스 요리. 평점 4.8.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 월~토 12:00~14:30, 19:00~22:30</span><span class="mp">💶 €20~35 / 1인</span></div><div class="mr"><span class="mt">💡 일요일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('La Cantine Provencale 9 Rue Bivouac Napoleon Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5521,7.0175,'La Cantine Provençale Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Medami</div><div class="cd">연어·트러플 파스타. 올데이 다이닝.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~22:00</span><span class="mp">💶 €20~35 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Medami 30bis Rue Hoche Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.553,7.0218,'Medami Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">L'Assiette Provençale</div><div class="cd">구항구 앞. 문어구이·생선 수프.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~일 12:00~14:30, 19:00~22:00</span><span class="mp">💶 €25~45 / 1인</span></div><div class="mr"><span class="mt">💡 월요일 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('LAssiette Provencale 9 Quai Saint Pierre Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.55,7.012,'L Assiette Provençale Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Le Welcome</div><div class="cd">구항구 뷰. 로컬. 올데이 영업.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 08:30~22:30</span><span class="mp">💶 €18~30 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Le Welcome 2 Rue de la Rampe Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5495,7.0119,'Le Welcome Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🟡 예약 권장</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍔</div><div class="cb"><div class="cn">Black Sails – Pirate Tavern ⭐</div><div class="cd">평점 4.9. 칸 최고 버거·스테이크.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~일 19:00~23:00</span><span class="mp">💶 €25~45 / 1인</span></div><div class="mr"><span class="mt">💡 월·화 휴무. 저녁만. 예약 1~2일 전.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('Black Sails Pirate Tavern 39 Rue Georges Clemenceau Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5491,7.0114,'Black Sails Cannes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Corne</div><div class="cd">조지아 요리 전문. 독특한 맛.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 19:00~23:00</span><span class="mp">💶 €25~40 / 1인</span></div><div class="mr"><span class="mt">💡 저녁만 운영. 예약 권장.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('La Corne 16 Rue Saint Dizier Cannes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5513,7.0088,'La Corne Cannes')"><span>🚗 우버</span></div></div>
+</div>
+</div><div class="fp" id="rp3"><div class="sl">🟢 워크인 가능</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Angelo's by Le Milano ⭐</div><div class="cd">피자·파스타 최고. 영어 잘 됨. 매일 오픈.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 매일 09:00~22:30</span><span class="mp">💶 €15~28 / 1인</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Angelo by Le Milano Antibes 2 Rue de la Tourraque')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.58,7.1271,'Angelo Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Ruby's Garden</div><div class="cd">쪽갈비 유명. 아늑한 정원 테라스.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화·목~일 12:00~22:00</span><span class="mp">💶 €20~35 / 1인</span></div><div class="mr"><span class="mt">💡 월·수 휴무.</span></div></div><div class="tags"><span class="tag tw">워크인</span></div><div class="btns"><div class="bm" onclick="gm('Ruby Garden Antibes 37 Rue Vauban')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5826,7.1228,'Ruby Garden Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🟡 예약 권장</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">La Taille de Guêpe ⭐</div><div class="cd">아름다운 플레이팅. 오리·참치·가리비 강추.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~토 12:00~14:00, 19:00~22:00</span><span class="mp">💶 €35~55 / 1인</span></div><div class="mr"><span class="mt">💡 화·일·월 휴무. 예약 3~5일 전.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('La Taille de Guepe 24 Rue de Fersen Antibes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5803,7.125,'La Taille de Guêpe Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">🍽</div><div class="cb"><div class="cn">Restaurant le Vauban</div><div class="cd">코스 전문. 서프라이즈 디시 서비스.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 수~일 12:00~14:00, 19:00~21:30</span><span class="mp">💶 €30~50 / 1인</span></div><div class="mr"><span class="mt">💡 월·화 휴무.</span></div></div><div class="tags"><span class="tag ta">예약 권장</span></div><div class="btns"><div class="bm" onclick="gm('Restaurant le Vauban 7bis Rue Thuret Antibes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5819,7.1265,'Restaurant le Vauban Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div class="sl">🔴 예약 필수</div>
+<div class="card">
+  <div class="card-top"><div class="ci">⭐⭐</div><div class="cb"><div class="cn">La Cafetière Fêlée</div><div class="cd">아시아·프렌치 퓨전. 여행 중 최고 식사 평가 다수.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 화~금 12:00~13:30, 19:00~21:30</span><span class="mp">💶 €40~65 / 1인</span></div><div class="mr"><span class="mt">💡 토·일·월 휴무. 2주 전 예약 필수.</span></div></div><div class="tags"><span class="tag tr">예약 필수</span></div><div class="btns"><div class="bm" onclick="gm('Restaurant La Cafetiere Felee 18 Rue du Marc Antibes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5807,7.1247,'La Cafetière Fêlée')"><span>🚗 우버</span></div></div>
+</div>
+<div class="card">
+  <div class="card-top"><div class="ci">⭐</div><div class="cb"><div class="cn">La Petite Escale</div><div class="cd">평점 4.9. 재방문율 최고.</div></div></div>
+  <div class="meta"><div class="mr"><span class="mh">🕐 불규칙 영업</span><span class="mp">💶 €30~50 / 1인</span></div><div class="mr"><span class="mt">💡 SNS 영업시간 확인 필수. 예약 필수.</span></div></div><div class="tags"><span class="tag tr">예약 필수</span></div><div class="btns"><div class="bm" onclick="gm('la petite escale 30 Rue Fourmilliere Antibes')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.5799,7.123,'La Petite Escale Antibes')"><span>🚗 우버</span></div></div>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;padding:11px 13px;background:var(--bg2);border-radius:var(--r);border:0.5px solid var(--border);"><span style="font-size:11px;color:var(--text2);">🟢 워크인</span><span style="font-size:11px;color:var(--text2);">🟡 예약 권장</span><span style="font-size:11px;color:var(--text2);">🔴 예약 필수</span><span style="font-size:11px;color:var(--text2);">⭐ 미슐랭</span></div></div></div>
+
+<!-- 숙소 -->
+<div class="pane" id="p13">
+<div style="font-size:18px;font-weight:600;margin-bottom:16px;">🏨 숙소</div>
+<div class="hcard"><div class="hct"><div class="hcn">Maison Albar – Le Victoria</div><div class="hcdate">6/2 – 6/4</div></div><div class="hcstar">⭐⭐⭐⭐⭐ 5성급</div><div class="hcnote">프로므나드 데 장글레 해변 바로 앞.</div><div class="btns"><div class="bm" onclick="gm('Maison Albar Le Victoria Nice Promenade des Anglais')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.6946,7.2668,'Maison Albar')"><span>🚗 우버</span></div></div></div>
+<div class="hcard"><div class="hct"><div class="hcn">DoubleTree by Hilton Nice Centre Iconic</div><div class="hcdate">6/4 – 6/8</div></div><div class="hcstar">⭐⭐⭐⭐ 4성급</div><div class="hcnote">니스 시내 중심. 쇼핑·맛집 도보권.</div><div class="btns"><div class="bm" onclick="gm('DoubleTree by Hilton Nice Centre Iconic')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7059,7.2649,'DoubleTree Nice')"><span>🚗 우버</span></div></div></div>
+<div class="hcard"><div class="hct"><div class="hcn">Hôtel Hermitage Monte-Carlo</div><div class="hcdate">6/8 – 6/9</div></div><div class="hcstar">⭐⭐⭐⭐⭐ 5성급</div><div class="hcnote">카지노 광장 바로 옆. 모나코 최고급.</div><div class="btns"><div class="bm" onclick="gm('Hotel Hermitage Monte Carlo Monaco')"><span>📍 위치</span></div><div class="bu" onclick="ub(43.7376,7.4277,'Hermitage Monte-Carlo')"><span>🚗 우버</span></div></div></div>
+</div>
+
+<!-- 환율 -->
+<div class="pane" id="p14">
+<div style="font-size:18px;font-weight:600;margin-bottom:4px;">💱 환율 계산기</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px;">EUR ↔ KRW 실시간</div>
+<div class="fxbox">
+  <div class="fxbig" id="fxBig">불러오는 중...</div>
+  <div class="fxsub" id="fxSub">1 EUR = ? KRW</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+    <div id="fxTime" style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;">-</div>
+    <div class="bm" style="padding:5px 12px;flex:none;" onclick="loadFx()"><span style="font-size:11px;">🔄 새로고침</span></div>
+  </div>
+  <div class="fxrow">
+    <div class="fxcol"><div class="fxlabel">EUR (유로)</div><input class="fxinput" id="eurIn" type="number" inputmode="decimal" placeholder="0" oninput="calcKRW()"></div>
+    <div class="fxsep">⇄</div>
+    <div class="fxcol"><div class="fxlabel">KRW (원)</div><input class="fxinput" id="krwIn" type="number" inputmode="decimal" placeholder="0" oninput="calcEUR()"></div>
+  </div>
+  <div class="fxqrow">
+    <div class="fxq" onclick="setE(10)">€10</div><div class="fxq" onclick="setE(20)">€20</div><div class="fxq" onclick="setE(50)">€50</div><div class="fxq" onclick="setE(100)">€100</div><div class="fxq" onclick="setE(200)">€200</div><div class="fxq" onclick="setE(500)">€500</div>
+  </div>
+</div>
+<div class="sl">💡 여행 중 참고 금액</div>
+<div class="refcard"><div class="reficon">☕</div><div class="refbody"><div class="refname">카페 아이스아메리카노</div><div class="refrange">€3.5 – €5</div><div class="refkrw" id="r0">계산 중...</div></div></div>
+<div class="refcard"><div class="reficon">🍺</div><div class="refbody"><div class="refname">생맥주 1잔</div><div class="refrange">€5 – €8</div><div class="refkrw" id="r1">계산 중...</div></div></div>
+<div class="refcard"><div class="reficon">🍽</div><div class="refbody"><div class="refname">로컬 식당 점심</div><div class="refrange">€15 – €30</div><div class="refkrw" id="r2">계산 중...</div></div></div>
+<div class="refcard"><div class="reficon">🚗</div><div class="refbody"><div class="refname">니스→모나코 우버</div><div class="refrange">€35 – €60</div><div class="refkrw" id="r3">계산 중...</div></div></div>
+<div class="refcard"><div class="reficon">🎰</div><div class="refbody"><div class="refname">카지노 입장료</div><div class="refrange">€17</div><div class="refkrw" id="r4">계산 중...</div></div></div>
+<div class="refcard"><div class="reficon">🏨</div><div class="refbody"><div class="refname">Hermitage 숙박</div><div class="refrange">€1,500~</div><div class="refkrw" id="r5">계산 중...</div></div></div>
+</div>
+
+<!-- 날씨 -->
+<div class="pane" id="p15">
+<div style="font-size:18px;font-weight:600;margin-bottom:4px;">🌤 날씨</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:14px;">실시간 날씨 정보</div>
+<div class="wxtabs">
+  <div class="wxtab on" id="wxt-nice" onclick="switchWx('nice')">🌊 니스</div>
+  <div class="wxtab" id="wxt-monaco" onclick="switchWx('monaco')">🎰 모나코</div>
+</div>
+<div id="wx-content"><div class="wxmsg">🌀 날씨 불러오는 중...</div></div>
+</div>
+
+<!-- 비상 연락처 -->
+<div class="pane" id="p16">
+<div style="font-size:18px;font-weight:600;margin-bottom:4px;">🚨 비상 연락처</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px;">탭하면 바로 전화 연결</div>
+<div class="sl">🚨 긴급 신고</div>
+<div class="emcard" onclick="call('112')"><div class="emicon emred">🚨</div><div class="embody"><div class="emname">긴급 통합신고 (유럽 공통)</div><div class="emnum">112</div><div class="emnote">경찰·소방·앰뷸런스 통합. 영어 가능.</div></div><div class="emcall">📞</div></div>
+<div class="emcard" onclick="call('15')"><div class="emicon emred">🚑</div><div class="embody"><div class="emname">앰뷸런스 (SAMU)</div><div class="emnum">15</div><div class="emnote">의료 응급. 프랑스 전용. 24시간.</div></div><div class="emcall">📞</div></div>
+<div class="emcard" onclick="call('17')"><div class="emicon emred">👮</div><div class="embody"><div class="emname">경찰 (Police)</div><div class="emnum">17</div><div class="emnote">범죄 신고. 프랑스 전용. 24시간.</div></div><div class="emcall">📞</div></div>
+<div class="emcard" onclick="call('18')"><div class="emicon emred">🚒</div><div class="embody"><div class="emname">소방서 (Pompiers)</div><div class="emnum">18</div><div class="emnote">화재·구조. 프랑스 전용. 24시간.</div></div><div class="emcall">📞</div></div>
+<div class="sl">🏥 병원</div>
+<div class="emcard" onclick="call('+33493859585')"><div class="emicon emblue">🏥</div><div class="embody"><div class="emname">니스 대학병원 (CHU Nice)</div><div class="emnum">+33 4 93 85 95 85</div><div class="emnote">니스 최대 종합병원. 응급실 24시간.</div></div><div class="emcall">📞</div></div>
+<div class="emcard" onclick="call('+37797988000')"><div class="emicon emblue">🏥</div><div class="embody"><div class="emname">모나코 공립병원 (CHPG)</div><div class="emnum">+377 97 98 80 00</div><div class="emnote">모나코 유일 공립병원. 응급 24시간.</div></div><div class="emcall">📞</div></div>
+<div class="sl">💳 카드 분실</div>
+<div class="emcard" onclick="call('+18008472911')"><div class="emicon emamber">💳</div><div class="embody"><div class="emname">Visa 해외 긴급 분실신고</div><div class="emnum">+1 800 847 2911</div><div class="emnote">Visa 카드 공통. 24시간. 수신자 부담.</div></div><div class="emcall">📞</div></div>
+<div class="emcard" onclick="call('+18005272397')"><div class="emicon emamber">💳</div><div class="embody"><div class="emname">Mastercard 해외 긴급 분실신고</div><div class="emnum">+1 800 527 2397</div><div class="emnote">Mastercard 공통. 24시간.</div></div><div class="emcall">📞</div></div>
+<div class="sl">🇰🇷 한국 대사관·영사관</div>
+<div class="emcard" onclick="call('+33147530101')"><div class="emicon emteal">🇰🇷</div><div class="embody"><div class="emname">주프랑스 한국대사관 (파리)</div><div class="emnum">+33 1 47 53 01 01</div><div class="emnote">여권분실·사건사고. 긴급 영사 24시간.</div></div><div class="emcall">📞</div></div>
+<div class="emcard" onclick="call('+33491164800')"><div class="emicon emteal">🇰🇷</div><div class="embody"><div class="emname">주마르세유 한국 분관 ⭐</div><div class="emnum">+33 4 91 16 48 00</div><div class="emnote">니스·모나코·칸 관할. 가장 가까운 영사관.</div></div><div class="emcall">📞</div></div>
+<div class="emcard" onclick="call('+827982100')"><div class="emicon emteal">🇰🇷</div><div class="embody"><div class="emname">외교부 영사콜센터 (한국)</div><div class="emnum">+82 7 98 21 00</div><div class="emnote">해외 사건·사고 24시간 한국어 상담.</div></div><div class="emcall">📞</div></div>
+<div class="sl">🏨 숙소 연락처</div>
+<div class="emcard" onclick="call('+33493161200')"><div class="emicon empur">🏨</div><div class="embody"><div class="emname">Maison Albar – Le Victoria</div><div class="emnum">+33 4 93 16 12 00</div><div class="emnote">6/2 – 6/4 숙소.</div></div><div class="emcall">📞</div></div>
+<div class="emcard" onclick="call('+33492038000')"><div class="emicon empur">🏨</div><div class="embody"><div class="emname">DoubleTree by Hilton Nice</div><div class="emnum">+33 4 92 03 80 00</div><div class="emnote">6/4 – 6/8 숙소.</div></div><div class="emcall">📞</div></div>
+<div class="emcard" onclick="call('+37798063100')"><div class="emicon empur">🏨</div><div class="embody"><div class="emname">Hôtel Hermitage Monte-Carlo</div><div class="emnum">+377 98 06 31 00</div><div class="emnote">6/8 – 6/9 숙소.</div></div><div class="emcall">📞</div></div>
+</div>
+
+<!-- 회화 -->
+<div class="pane" id="p17">
+<div style="font-size:18px;font-weight:600;margin-bottom:4px;">🗣 여행 회화</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:16px;">탭해서 펼치기 — 핵심 표현만</div>
+<div class="phcat"><div class="phhdr" onclick="togglePh(this)"><div class="phtitle">👋 기본 인사·감사</div><div class="phchev">▼</div></div><div class="phlist"><div class="phitem"><div class="phkr">안녕하세요 (낮)</div><div class="phfr">Bonjour</div><div class="phpron">봉주르</div></div><div class="phitem"><div class="phkr">안녕하세요 (저녁)</div><div class="phfr">Bonsoir</div><div class="phpron">봉수아르</div></div><div class="phitem"><div class="phkr">감사합니다</div><div class="phfr">Merci beaucoup</div><div class="phpron">메르시 보꾸</div></div><div class="phitem"><div class="phkr">실례합니다</div><div class="phfr">Excusez-moi / Pardon</div><div class="phpron">엑스큐제 무아 / 파르동</div></div><div class="phitem"><div class="phkr">영어 하실 수 있으세요?</div><div class="phfr">Parlez-vous anglais?</div><div class="phpron">빠를레 부 앙글레?</div></div><div class="phitem"><div class="phkr">잘 모르겠어요</div><div class="phfr">Je ne comprends pas</div><div class="phpron">주 느 꽁프랑 빠</div></div></div></div>
+<div class="phcat"><div class="phhdr" onclick="togglePh(this)"><div class="phtitle">☕ 카페 · 바</div><div class="phchev">▼</div></div><div class="phlist"><div class="phitem"><div class="phkr">아이스 아메리카노 하나 주세요</div><div class="phfr">Un café allongé glacé, s'il vous plaît</div><div class="phpron">앙 카페 알롱제 글라세, 실 부 플레</div></div><div class="phitem"><div class="phkr">생맥주 두 잔 주세요</div><div class="phfr">Deux bières pression, s'il vous plaît</div><div class="phpron">두 비에르 프레씨옹, 실 부 플레</div></div><div class="phitem"><div class="phkr">메뉴 좀 볼 수 있을까요?</div><div class="phfr">La carte, s'il vous plaît</div><div class="phpron">라 카르뜨, 실 부 플레</div></div><div class="phitem"><div class="phkr">계산서 주세요</div><div class="phfr">L'addition, s'il vous plaît</div><div class="phpron">라디씨옹, 실 부 플레</div></div><div class="phitem"><div class="phkr">카드 되나요?</div><div class="phfr">Vous acceptez la carte?</div><div class="phpron">부 악셉테 라 카르뜨?</div></div></div></div>
+<div class="phcat"><div class="phhdr" onclick="togglePh(this)"><div class="phtitle">🍽 식당</div><div class="phchev">▼</div></div><div class="phlist"><div class="phitem"><div class="phkr">2명인데 자리 있나요?</div><div class="phfr">Une table pour deux, s'il vous plaît</div><div class="phpron">윈 따블 뿌르 두, 실 부 플레</div></div><div class="phitem"><div class="phkr">이거 추천해 주세요</div><div class="phfr">Qu'est-ce que vous recommandez?</div><div class="phpron">께스끄 부 르꼬만데?</div></div><div class="phitem"><div class="phkr">아주 맛있어요!</div><div class="phfr">C'est délicieux!</div><div class="phpron">세 델리씨외!</div></div><div class="phitem"><div class="phkr">물 주세요 (수돗물 무료)</div><div class="phfr">Une carafe d'eau, s'il vous plaît</div><div class="phpron">윈 카라프 도, 실 부 플레</div></div><div class="phitem"><div class="phkr">같이 계산할게요</div><div class="phfr">Ensemble, s'il vous plaît</div><div class="phpron">앙상블, 실 부 플레</div></div></div></div>
+<div class="phcat"><div class="phhdr" onclick="togglePh(this)"><div class="phtitle">🚗 택시 · 이동</div><div class="phchev">▼</div></div><div class="phlist"><div class="phitem"><div class="phkr">이 주소로 가주세요</div><div class="phfr">À cette adresse, s'il vous plaît</div><div class="phpron">아 세뜨 아드레스, 실 부 플레</div></div><div class="phitem"><div class="phkr">얼마나 걸려요?</div><div class="phfr">Combien de temps?</div><div class="phpron">꽁비앙 드 떵?</div></div><div class="phitem"><div class="phkr">여기서 세워주세요</div><div class="phfr">Arrêtez-vous ici, s'il vous plaît</div><div class="phpron">아레떼 부 이씨, 실 부 플레</div></div><div class="phitem"><div class="phkr">공항으로 가주세요</div><div class="phfr">À l'aéroport, s'il vous plaît</div><div class="phpron">아 라에로포르, 실 부 플레</div></div></div></div>
+<div class="phcat"><div class="phhdr" onclick="togglePh(this)"><div class="phtitle">🎰 카지노</div><div class="phchev">▼</div></div><div class="phlist"><div class="phitem"><div class="phkr">칩으로 교환하고 싶어요</div><div class="phfr">Je voudrais des jetons</div><div class="phpron">주 부드레 데 쥬통</div></div><div class="phitem"><div class="phkr">최소 베팅이 얼마예요?</div><div class="phfr">Quel est le minimum?</div><div class="phpron">껠 에 르 미니뭄?</div></div><div class="phitem"><div class="phkr">칩을 현금으로 바꾸고 싶어요</div><div class="phfr">Je voudrais encaisser mes jetons</div><div class="phpron">주 부드레 엉께쎄 메 쥬통</div></div></div></div>
+<div class="phcat"><div class="phhdr" onclick="togglePh(this)"><div class="phtitle">🚨 긴급 상황</div><div class="phchev">▼</div></div><div class="phlist"><div class="phitem"><div class="phkr">도와주세요!</div><div class="phfr">Au secours! / À l'aide!</div><div class="phpron">오 스꾸르! / 아 레드!</div></div><div class="phitem"><div class="phkr">지갑을 도난당했어요</div><div class="phfr">On m'a volé mon portefeuille</div><div class="phpron">옹 마 볼레 몽 뽀르뜨푀이</div></div><div class="phitem"><div class="phkr">여권을 잃어버렸어요</div><div class="phfr">J'ai perdu mon passeport</div><div class="phpron">제 뻬르뒤 몽 파스포르</div></div><div class="phitem"><div class="phkr">의사가 필요해요</div><div class="phfr">J'ai besoin d'un médecin</div><div class="phpron">제 브즈왕 당 메드생</div></div><div class="phitem"><div class="phkr">한국 대사관에 연락해야 해요</div><div class="phfr">Je dois contacter l'ambassade coréenne</div><div class="phpron">주 두아 꽁딱떼 랑바사드 꼬레엔느</div></div></div></div>
+</div>
+
+
+<!-- 내 근처 -->
+<div class="pane" id="p18">
+<div style="font-size:18px;font-weight:600;margin-bottom:4px;">📍 내 근처 <span id="nearbyCount" style="font-size:13px;font-weight:500;color:var(--text2);"></span></div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:14px;">현재 위치 기준 가까운 순서</div>
+
+<!-- 카테고리 필터 -->
+<div class="ftabs" id="nearbyFilters">
+  <div class="ftab on" onclick="filterNearby('all')">🔍 전체</div>
+  <div class="ftab" onclick="filterNearby('cafe')">☕ 카페</div>
+  <div class="ftab" onclick="filterNearby('beer')">🍺 맥주</div>
+  <div class="ftab" onclick="filterNearby('food')">🍽 식당</div>
+  <div class="ftab" onclick="filterNearby('spot')">🏛 명소</div>
+  <div class="ftab" onclick="filterNearby('shop')">🛒 편의점</div>
+</div>
+
+<div id="nearbyStatus" style="text-align:center;padding:20px;color:var(--text2);font-size:13px;">
+  📡 위치 확인 중...
+</div>
+<div id="nearbyList"></div>
+</div>
+
+</div><!-- end body -->
+
+<!-- 하단 네비 (좌우 스크롤) -->
+<div class="bnav">
+  <button class="nb on" id="nb0" onclick="swnav(0,lastDay)"><span class="nbi">📅</span><span class="nbl">일정</span></button>
+  <button class="nb" id="nb1" onclick="swnav(1,18)"><span class="nbi">📍</span><span class="nbl">내 근처</span></button>
+  <button class="nb" id="nb2" onclick="swnav(2,10)"><span class="nbi">☕</span><span class="nbl">카페</span></button>
+  <button class="nb" id="nb3" onclick="swnav(3,11)"><span class="nbi">🍺</span><span class="nbl">맥주</span></button>
+  <button class="nb" id="nb4" onclick="swnav(4,12)"><span class="nbi">🍽</span><span class="nbl">식당</span></button>
+  <button class="nb" id="nb5" onclick="swnav(5,9)"><span class="nbi">🌿</span><span class="nbl">자연</span></button>
+  <button class="nb" id="nb6" onclick="swnav(6,13)"><span class="nbi">🏨</span><span class="nbl">숙소</span></button>
+  <button class="nb" id="nb7" onclick="swnav(7,14)"><span class="nbi">💱</span><span class="nbl">환율</span></button>
+  <button class="nb" id="nb8" onclick="swnav(8,15)"><span class="nbi">🌤</span><span class="nbl">날씨</span></button>
+  <button class="nb" id="nb9" onclick="swnav(9,16)"><span class="nbi">🚨</span><span class="nbl">비상</span></button>
+  <button class="nb" id="nb10" onclick="swnav(10,17)"><span class="nbi">🗣</span><span class="nbl">회화</span></button>
+</div>
+</div>
+
+<script>
+const TOTAL=19; let lastDay=0;
+function go(i){
+  for(let j=0;j<TOTAL;j++){
+    const p=document.getElementById("p"+j); if(p) p.classList.toggle("on",j===i);
+    const t=document.querySelectorAll(".dtab")[j]; if(t) t.classList.toggle("on",j===i&&j<=8);
+  }
+  if(i<=7) lastDay=i;
+  document.getElementById("body").scrollTop=0;
+  const at=document.querySelectorAll(".dtab")[i];
+  if(at) at.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+  if(i===14&&!fxRate) loadFx();
+  if(i===15) loadWx(wxCity);
+  if(i===18) loadNearby();
+}
+function swnav(nb,pi){
+  for(let i=0;i<11;i++){const b=document.getElementById("nb"+i);if(b)b.classList.remove("on");}
+  const b=document.getElementById("nb"+nb); if(b)b.classList.add("on");
+  go(pi);
+}
+function gm(q){window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q),"_blank");}
+function ub(lat,lng,dest){
+  event.stopPropagation();
+  window.location.href="uber://?action=setPickup&pickup=my_location&dropoff[latitude]="+lat+"&dropoff[longitude]="+lng+"&dropoff[nickname]="+encodeURIComponent(dest);
+  setTimeout(()=>window.open("https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]="+lat+"&dropoff[longitude]="+lng+"&dropoff[nickname]="+encodeURIComponent(dest),"_blank"),1000);
+}
+function call(n){window.location.href="tel:"+n;}
+function showRegion(i){
+  for(let j=0;j<4;j++){
+    const p=document.getElementById("rp"+j); if(p)p.classList.toggle("on",j===i);
+    const t=document.getElementById("rt"+j); if(t)t.className=j===i?"ftab on":"ftab";
+  }
+  document.getElementById("body").scrollTop=0;
+}
+function showArea(i){
+  ["ap0","ap1"].forEach((id,j)=>{const p=document.getElementById(id);if(p)p.classList.toggle("on",j===i);});
+  document.querySelectorAll("#p8 .ftab").forEach((t,j)=>t.className=j===i?"ftab on":"ftab");
+  document.getElementById("body").scrollTop=0;
+}
+function showCafe(i){
+  ["cp0","cp1","cp2"].forEach((id,j)=>{const p=document.getElementById(id);if(p)p.classList.toggle("on",j===i);});
+  ["ct0","ct1","ct2"].forEach((id,j)=>{const t=document.getElementById(id);if(t)t.className=j===i?"ftab on":"ftab";});
+}
+function togglePh(hdr){
+  const list=hdr.nextElementSibling,chev=hdr.querySelector(".phchev"),o=list.classList.contains("open");
+  list.classList.toggle("open",!o);chev.classList.toggle("open",!o);
+}
+// 환율
+let fxRate=0;
+async function loadFx(){
+  try{
+    const d=await(await fetch("https://open.er-api.com/v6/latest/EUR")).json();
+    fxRate=d.rates.KRW;
+    const now=new Date();
+    document.getElementById("fxBig").textContent="₩"+Math.round(fxRate).toLocaleString();
+    document.getElementById("fxSub").textContent="1 EUR = ₩"+Math.round(fxRate).toLocaleString();
+    document.getElementById("fxTime").textContent=now.getHours()+":"+String(now.getMinutes()).padStart(2,"0")+" 기준";
+    [[0,4,5],[1,5,8],[2,15,30],[3,35,60],[4,17,17],[5,1500,2000]].forEach(([id,lo,hi])=>{
+      const el=document.getElementById("r"+id);if(!el)return;
+      el.textContent=lo===hi?"≈ ₩"+Math.round(lo*fxRate).toLocaleString():"₩"+Math.round(lo*fxRate).toLocaleString()+"~₩"+Math.round(hi*fxRate).toLocaleString();
+    });
+  }catch(e){document.getElementById("fxBig").textContent="오류";}
+}
+function calcKRW(){const e=parseFloat(document.getElementById("eurIn").value)||0;if(fxRate)document.getElementById("krwIn").value=e?Math.round(e*fxRate):"";}
+function calcEUR(){const k=parseFloat(document.getElementById("krwIn").value)||0;if(fxRate)document.getElementById("eurIn").value=k?(k/fxRate).toFixed(2):"";}
+function setE(v){document.getElementById("eurIn").value=v;calcKRW();}
+// 날씨
+const WX={nice:{lat:43.7102,lon:7.2620,name:"니스",em:"🌊"},monaco:{lat:43.7384,lon:7.4246,name:"모나코",em:"🎰"}};
+let wxCity="nice",wxCache={};
+const WXI={0:"☀️",1:"🌤",2:"⛅",3:"☁️",45:"🌫",51:"🌦",53:"🌦",55:"🌧",61:"🌧",63:"🌧",65:"🌧",71:"❄️",80:"🌦",81:"🌦",82:"⛈",95:"⛈",99:"⛈"};
+const WXD={0:"맑음",1:"대체로 맑음",2:"구름 조금",3:"흐림",45:"안개",51:"이슬비",61:"약한 비",63:"비",65:"강한 비",80:"소나기",82:"강한 소나기",95:"뇌우"};
+const DAYS=["일","월","화","수","목","금","토"];
+async function loadWx(key){
+  const city=WX[key],el=document.getElementById("wx-content");
+  if(wxCache[key]){renderWx(wxCache[key],city);return;}
+  el.innerHTML="<div class='wxmsg'>🌀 날씨 불러오는 중...</div>";
+  try{
+    const url="https://api.open-meteo.com/v1/forecast?latitude="+city.lat+"&longitude="+city.lon+"&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m,relativehumidity_2m,uv_index&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FParis&forecast_days=7";
+    const d=await(await fetch(url)).json();wxCache[key]=d;renderWx(d,city);
+  }catch(e){el.innerHTML="<div class='wxmsg' style='color:var(--red)'>⚠️ 날씨 불러오기 실패</div>";}
+}
+function renderWx(data,city){
+  const c=data.current,d=data.daily,code=c.weathercode;
+  let fc="";
+  for(let i=0;i<7;i++){
+    const dt=new Date(d.time[i]),dn=i===0?"오늘":i===1?"내일":DAYS[dt.getDay()];
+    fc+="<div class='wxday'><div class='wxdn'>"+dn+"</div><div class='wxdi'>"+(WXI[d.weathercode[i]]||"🌤")+"</div><div class='wxdh'>"+Math.round(d.temperature_2m_max[i])+"°</div><div class='wxdl'>"+Math.round(d.temperature_2m_min[i])+"°</div><div class='wxdr'>"+d.precipitation_probability_max[i]+"%</div></div>";
+  }
+  document.getElementById("wx-content").innerHTML="<div class='wxhero'><div class='wxcity'>"+city.em+" "+city.name+"</div><div class='wxbig'>"+(WXI[code]||"🌤")+"</div><div class='wxtemp'>"+Math.round(c.temperature_2m)+"°C</div><div class='wxfeel'>체감 "+Math.round(c.apparent_temperature)+"°C</div><div class='wxdesc'>"+(WXD[code]||"")+"</div></div><div class='wxgrid'><div class='wxstat'><div class='wxsl'>습도</div><div class='wxsv'>"+c.relativehumidity_2m+"%</div></div><div class='wxstat'><div class='wxsl'>풍속</div><div class='wxsv'>"+Math.round(c.windspeed_10m)+"<span style='font-size:11px'>km/h</span></div></div><div class='wxstat'><div class='wxsl'>UV</div><div class='wxsv'>"+Math.round(c.uv_index||0)+"</div></div></div><div class='wxfc'>"+fc+"</div><div style='font-size:10px;color:var(--text3);text-align:center'>Open-Meteo 제공</div>";
+}
+function switchWx(key){
+  wxCity=key;
+  document.querySelectorAll(".wxtab").forEach(t=>t.classList.remove("on"));
+  document.getElementById("wxt-"+key).classList.add("on");
+  loadWx(key);
+}
+// 날짜 자동 감지
+const today=new Date(),start=new Date("2026-06-02");
+const diff=Math.floor((today-start)/86400000);
+const badge=document.getElementById("dbadge");
+if(diff>=0&&diff<=7){go(diff);lastDay=diff;if(badge)badge.textContent="여행중 D+"+diff;}
+else if(diff<0&&badge)badge.textContent="D"+diff;
+
+// ── 내 근처 ──────────────────────────────────────────────
+const NEARBY_PLACES = [
+  {name:"La Claque Coffee Shop ⭐",cat:"cafe",lat:43.6977,lng:7.2763,hours:"매일 08:30~17:30",price:"€3~5",tip:"현금 선호. 원두 직접 로스팅.",map_q:"La Claque Coffee Shop 8 Rue du Pont Vieux Nice"},
+  {name:"HUG Café",cat:"cafe",lat:43.7036,lng:7.2657,hours:"매일 07:30~19:00",price:"€3.5~5",tip:"영어 가능.",map_q:"HUG Cafe 2 Rue de Suisse Nice"},
+  {name:"Maison Karlie",cat:"cafe",lat:43.7005,lng:7.2701,hours:"화~토 08:30~17:30",price:"€3.5~5",tip:"일·월 휴무.",map_q:"Maison Karlie Nice Rue Pastorelli"},
+  {name:"Blend Coffee & Vinyl",cat:"cafe",lat:43.6968,lng:7.2767,hours:"월·목~일 08:30~17:30",price:"€3~5",tip:"화·수 휴무.",map_q:"Blend Coffee Vinyl Nice 22 Rue Benoit Bunico"},
+  {name:"Café Alma",cat:"cafe",lat:43.6970,lng:7.2767,hours:"월·수~일 09:00~17:30",price:"€3~5",tip:"화요일 휴무. OG 쿠키 강추.",map_q:"Cafe Alma 22 Rue Benoit Bunico Nice"},
+  {name:"Brume Coffee Nice",cat:"cafe",lat:43.6989,lng:7.2785,hours:"수~일 10:15~17:45",price:"€3~5",tip:"월·화 휴무. 올드니스.",map_q:"Brume Coffee Nice 34 Rue Pairioliere Nice"},
+  {name:"SAVVA Coffee",cat:"cafe",lat:43.6948,lng:7.2548,hours:"월~토 06:00~18:00",price:"€3~4.5",tip:"일요일 휴무.",map_q:"SAVVA Coffee Shop 105 Rue de France Nice"},
+  {name:"Le Kawa Brunch & Coffee",cat:"cafe",lat:43.7038,lng:7.2619,hours:"매일 08:00~16:00",price:"€4~8",tip:"샥슈카 강추. 영어 OK.",map_q:"Le Kawa Brunch Coffee Shop Nice 23 Rue de Belgique"},
+  {name:"Full Bloom Café",cat:"cafe",lat:43.6991,lng:7.2829,hours:"매일 08:30~17:30",price:"€3.5~5",tip:"반려견 동반 가능.",map_q:"Full Bloom Cafe Nice 14 Rue Emmanuel Philibert"},
+  {name:"Polyglot Coffee & Wine Bar",cat:"cafe",lat:43.6952,lng:7.2554,hours:"수~일 07:00~23:00",price:"€3~6",tip:"화요일 휴무.",map_q:"Polyglot Coffee Wine Bar 68 Rue de France Nice"},
+  {name:"스타벅스 장메드생",cat:"cafe",lat:43.7018,lng:7.2674,hours:"매일 08:00~19:30",price:"€5~7",tip:"",map_q:"Starbucks 30 Avenue Jean Medecin Nice"},
+  {name:"스타벅스 마세나",cat:"cafe",lat:43.6972,lng:7.2657,hours:"매일 07:30~20:30",price:"€5~7",tip:"",map_q:"Starbucks 26 Rue Massena Nice"},
+  {name:"스타벅스 니스역",cat:"cafe",lat:43.7052,lng:7.2623,hours:"매일 08:00~19:00",price:"€5~7",tip:"기차역 바로 옆.",map_q:"Starbucks 2 Avenue Thiers Nice"},
+  {name:"Casa del Caffè ⭐",cat:"cafe",lat:43.7392,lng:7.4246,hours:"월~토 07:00~19:00",price:"€4~6",tip:"일요일 휴무.",map_q:"Casa del Caffe Monaco Avenue de la Costa"},
+  {name:"스타벅스 모나코",cat:"cafe",lat:43.7391,lng:7.4270,hours:"매일 08:00~21:00",price:"€6~8",tip:"모나코 물가라 더 비쌈.",map_q:"Starbucks Monaco Place du Casino"},
+  {name:"AMAMO Specialty Coffee (메나디에) ⭐",cat:"cafe",lat:43.5517,lng:7.0122,hours:"매일 09:00~17:00",price:"€3.5~5",tip:"프랑스 스페셜티 1위 2025.",map_q:"AMAMO Specialty Coffee 74 Rue Meynadier Cannes"},
+  {name:"AMAMO Specialty Coffee (해변) ⭐",cat:"cafe",lat:43.5484,lng:7.0102,hours:"매일 09:00~17:00",price:"€3.5~5",tip:"해변 뷰 테라스.",map_q:"Amamo Specialty Coffee 12 Boulevard Jean Hibert Cannes"},
+  {name:"Lollocaffè",cat:"cafe",lat:43.5524,lng:7.0139,hours:"화~일 07:00~16:00",price:"€2~4",tip:"월요일 휴무. 이탈리안 에스프레소.",map_q:"Lollocaffe 33 Rue Meynadier Cannes"},
+  {name:"Good Mate Coffee 칸",cat:"cafe",lat:43.5530,lng:7.0214,hours:"매일 08:00~17:00",price:"€3~5",tip:"",map_q:"Good Mate Coffee 28 Rue Hoche Cannes"},
+  {name:"Cafés Sauvage",cat:"cafe",lat:43.5533,lng:7.0218,hours:"화~토 08:30~18:00",price:"€4~7",tip:"월·일 휴무. 브런치 강추.",map_q:"Cafes Sauvage 12 Rue Helene Vagliano Cannes"},
+  {name:"ITINÉRAIRE CAFÉ",cat:"cafe",lat:43.5530,lng:7.0200,hours:"월~토 08:30~19:00",price:"€3~6",tip:"일요일 휴무.",map_q:"Itineraire Cafe 10 Rue Hoche Cannes"},
+  {name:"NOMADS Coffee ⭐",cat:"cafe",lat:43.5809,lng:7.1272,hours:"매일 08:00~17:00",price:"€3~5",tip:"반려견 동반 가능.",map_q:"NOMADS coffee 3 Rue Sade Antibes"},
+  {name:"Amour Café",cat:"cafe",lat:43.5798,lng:7.1256,hours:"화~일 09:00~15:00",price:"€3.5~6",tip:"월요일 휴무.",map_q:"Amour Cafe 19 Rue des Revennes Antibes"},
+  {name:"Good Mate Coffee 앙티브",cat:"cafe",lat:43.5815,lng:7.1274,hours:"매일 08:00~17:00",price:"€3~5",tip:"",map_q:"Good Mate Coffee 3 Rue Georges Clemenceau Antibes"},
+  {name:"Petit Monsieur ⭐",cat:"cafe",lat:43.5803,lng:7.1250,hours:"매일 08:00~17:00",price:"€3~5",tip:"피스타치오 라테 강추.",map_q:"Petit Monsieur 25 Rue de Fersen Antibes"},
+  {name:"Brasserie de Castillon ⭐",cat:"beer",lat:43.6991,lng:7.2837,hours:"수~토 17:00~24:00",price:"€5~8/잔",tip:"월·화·일 휴무. 자체 양조.",map_q:"Brasserie de Castillon Nice Rue Cassini"},
+  {name:"Beer District Libération",cat:"beer",lat:43.7082,lng:7.2613,hours:"매일 17:00~00:30",price:"€5~9/잔",tip:"탭 16종. 예약 0986797985.",map_q:"Beer District Liberation Nice Place Philippe Randon"},
+  {name:"Brasserie BLEUE",cat:"beer",lat:43.7022,lng:7.2761,hours:"수~토 16:00~23:00",price:"€5~8/잔",tip:"월·화·일 휴무.",map_q:"Brasserie Bleue Nice Rue Defly"},
+  {name:"Beercompany",cat:"beer",lat:43.6973,lng:7.2774,hours:"월·화·일 12:00~22:00 / 수~토 14:30~00:30",price:"€5~8/잔",tip:"올드니스. 자체 양조. 평점 4.9.",map_q:"Beercompany 4 ter Rue Rossetti Nice"},
+  {name:"Les Distilleries Idéales",cat:"beer",lat:43.6962,lng:7.2768,hours:"매일 09:00~00:30",price:"€4~8/잔",tip:"올드니스. 탭 다양. 평점 4.4.",map_q:"Les Distilleries Ideales 24 Rue de la Prefecture Nice"},
+  {name:"The Shop Craft Bar",cat:"beer",lat:43.6963,lng:7.2651,hours:"매일 16:00~02:30",price:"€5~9/잔",tip:"평점 4.8. 다트. 가성비 최고.",map_q:"The Shop Craft Bar 9 Rue Halevy Nice"},
+  {name:"Bocca Mar",cat:"beer",lat:43.6945,lng:7.2632,hours:"매일 09:00~17:00",price:"€5~8/잔",tip:"해변 뷰. 생맥주 가능.",map_q:"Bocca Mar Nice 15 Promenade des Anglais"},
+  {name:"Chez Acchiardo",cat:"food",lat:43.6965,lng:7.2771,hours:"월~금 12:00~14:30, 19:00~22:00",price:"€18~28/1인",tip:"주말 휴무. 현금만.",map_q:"Chez Acchiardo 38 Rue Droite Nice"},
+  {name:"La Cantine de Mémé ⭐",cat:"food",lat:43.6987,lng:7.2670,hours:"화~일 12:00~14:00, 19:30~21:45",price:"€20~35/1인",tip:"월요일 휴무.",map_q:"La Cantine de Meme 5 Rue Longchamp Nice"},
+  {name:"Bocca Mar (식당)",cat:"food",lat:43.6945,lng:7.2632,hours:"매일 09:00~17:00",price:"€25~40/1인",tip:"해변 뷰.",map_q:"Bocca Mar Nice 15 Promenade des Anglais"},
+  {name:"Les Sens",cat:"food",lat:43.7003,lng:7.2702,hours:"월~금 12:00~14:00, 19:30~21:30",price:"€28~45/1인",tip:"토·일 휴무.",map_q:"Les Sens 37 Rue Pastorelli Nice"},
+  {name:"Le Panier",cat:"food",lat:43.6958,lng:7.2769,hours:"월·토·일 12:00~13:15 / 목~일 19:00~21:15",price:"€40~70/1인",tip:"화·수 휴무. 블라인드 코스.",map_q:"Le Panier 5 Rue Barillerie Nice"},
+  {name:"Le Bouchon ⭐",cat:"food",lat:43.7117,lng:7.2910,hours:"화~토 12:00~14:00, 19:00~21:30",price:"€30~50/1인",tip:"월·일 휴무. 평점 4.9.",map_q:"Le Bouchon 34 Rue Mgr Alfred Daumas Nice"},
+  {name:"Aux Deux Chefs",cat:"food",lat:43.7093,lng:7.2572,hours:"월~토 12:00~14:30",price:"€25~40/1인",tip:"일요일 휴무. 비프 타르타르 강추.",map_q:"Aux deux chefs 56 Rue Dabray Nice"},
+  {name:"La Maison de Marie",cat:"food",lat:43.6977,lng:7.2685,hours:"매일 12:00~14:30, 19:00~23:00",price:"€30~50/1인",tip:"다오브 니수아즈 강추.",map_q:"La maison de Marie 5 Rue Massena Nice"},
+  {name:"Le Vingt4",cat:"food",lat:43.7003,lng:7.2645,hours:"월~금 12:00~14:30 / 화~토 19:00~22:00",price:"€30~50/1인",tip:"일요일 휴무.",map_q:"Le Vingt4 24 Rue Alphonse Karr Nice"},
+  {name:"The Instant",cat:"food",lat:43.7084,lng:7.2620,hours:"화~토 12:00~14:30 / 화~일 18:30~22:00",price:"€25~40/1인",tip:"월요일 휴무.",map_q:"The Instant 9 Rue Clement Roassal Nice"},
+  {name:"Chez René Socca",cat:"food",lat:43.6970,lng:7.2760,hours:"화~일 09:00~21:00",price:"€5~12/1인",tip:"월요일 휴무. 현금 필수.",map_q:"Chez Rene Socca Nice Old Town"},
+  {name:"Maison F",cat:"food",lat:43.6954,lng:7.2859,hours:"매일 12:00~14:30, 19:00~22:30",price:"€25~40/1인",tip:"항구 뷰. 수 라이브 뮤직.",map_q:"Maison F Restaurant 8 Quai des Docks Nice"},
+  {name:"La Terrasse (루프탑)",cat:"food",lat:43.6950,lng:7.2620,hours:"매일 12:00~22:00",price:"€25~45/1인",tip:"르 메리디앙 9층 루프탑. 예약 권장.",map_q:"La Terrasse Nice Promenade des Anglais"},
+  {name:"맥도날드 장메드생 47",cat:"food",lat:43.7048,lng:7.2651,hours:"매일 07:30~00:30",price:"€8~15/1인",tip:"",map_q:"McDonald's 47 Avenue Jean Medecin Nice"},
+  {name:"맥도날드 장메드생 20",cat:"food",lat:43.7003,lng:7.2684,hours:"매일 07:30~00:00",price:"€8~15/1인",tip:"",map_q:"McDonald's 20 Avenue Jean Medecin Nice"},
+  {name:"맥도날드 프로므나드",cat:"food",lat:43.6951,lng:7.2659,hours:"매일 07:30~00:30",price:"€8~15/1인",tip:"해변 바로 앞.",map_q:"McDonald's 1 Promenade des Anglais Nice"},
+  {name:"버거킹 장메드생",cat:"food",lat:43.7039,lng:7.2657,hours:"매일 10:00~23:00",price:"€8~15/1인",tip:"",map_q:"Burger King 41 Avenue Jean Medecin Nice"},
+  {name:"KFC 장메드생",cat:"food",lat:43.7052,lng:7.2654,hours:"매일 10:00~01:00",price:"€8~15/1인",tip:"",map_q:"KFC 64 Avenue Jean Medecin Nice"},
+  {name:"Caffè Milano ⭐",cat:"food",lat:43.7368,lng:7.4220,hours:"매일 12:00~22:30",price:"€25~45/1인",tip:"항구 뷰. 무셀 수프 강추.",map_q:"Caffe Milano 1 Quai Albert 1er Monaco"},
+  {name:"Chez Pierre ⭐",cat:"food",lat:43.7406,lng:7.4276,hours:"월~토 12:00~14:30, 18:30~22:30",price:"€25~40/1인",tip:"일요일 휴무. 평점 4.9.",map_q:"Chez Pierre Monaco Metropole Shopping"},
+  {name:"La Môme Monte-Carlo",cat:"food",lat:43.7372,lng:7.4240,hours:"매일 12:00~14:30, 19:00~23:30",price:"€40~70/1인",tip:"예약 권장.",map_q:"La Mome Monte Carlo 7 Avenue JF Kennedy Monaco"},
+  {name:"Marius Monaco",cat:"food",lat:43.7328,lng:7.4250,hours:"화~토 12:00~21:30",price:"€30~50/1인",tip:"월·일 휴무.",map_q:"Marius Monaco 6 Quai Antoine 1er"},
+  {name:"zēphyr Monaco",cat:"food",lat:43.7409,lng:7.4307,hours:"매일 12:00~22:30",price:"€35~60/1인",tip:"그리스 지중해 요리. 평점 4.8.",map_q:"zephyr Monaco 24 Quai du Petit Portier Monaco"},
+  {name:"La Cantine Provençale 칸 ⭐",cat:"food",lat:43.5521,lng:7.0175,hours:"월~토 12:00~14:30, 19:00~22:30",price:"€20~35/1인",tip:"일요일 휴무.",map_q:"La Cantine Provencale 9 Rue Bivouac Napoleon Cannes"},
+  {name:"L'Assiette Provençale",cat:"food",lat:43.5500,lng:7.0120,hours:"화~일 12:00~14:00, 19:00~22:00",price:"€25~45/1인",tip:"월요일 휴무.",map_q:"LAssiette Provencale 9 Quai Saint Pierre Cannes"},
+  {name:"La Môme Cannes",cat:"food",lat:43.5518,lng:7.0235,hours:"매일 19:00~00:00",price:"€40~70/1인",tip:"저녁만 운영. 라이브 뮤직.",map_q:"La Mome 6 Rue Florian Cannes"},
+  {name:"Le Pompon ⭐",cat:"food",lat:43.5523,lng:7.0146,hours:"화 19:15~21:30 / 수~토 12:15~13:30 19:15~21:30",price:"€35~55/1인",tip:"월·일 휴무. 평점 4.8.",map_q:"Le Pompon 4 Rue Emile Negrin Cannes"},
+  {name:"Le BAO",cat:"food",lat:43.5526,lng:7.0246,hours:"화~토 18:00~23:30",price:"€30~50/1인",tip:"월·일 휴무. 와인바+식당. 평점 4.8.",map_q:"Le BAO 7 Rue des Gabres Cannes"},
+  {name:"Aux Bons Enfants",cat:"food",lat:43.5516,lng:7.0120,hours:"화~토 12:00~13:30, 19:00~21:30",price:"€20~35/1인",tip:"현금만. 100년 된 가게.",map_q:"Aux Bons Enfants 80 Rue Meynadier Cannes"},
+  {name:"맥도날드 칸",cat:"food",lat:43.5520,lng:7.0151,hours:"매일 07:30~01:00",price:"€8~15/1인",tip:"",map_q:"McDonald's Cannes centre"},
+  {name:"Angelo's by Le Milano ⭐",cat:"food",lat:43.5800,lng:7.1271,hours:"매일 09:00~22:30",price:"€15~28/1인",tip:"영어 OK. 매일 오픈.",map_q:"Angelo by Le Milano Antibes 2 Rue de la Tourraque"},
+  {name:"Ruby's Garden",cat:"food",lat:43.5826,lng:7.1228,hours:"화·목~일 12:00~22:00",price:"€20~35/1인",tip:"월·수 휴무.",map_q:"Ruby Garden Antibes 37 Rue Vauban"},
+  {name:"Monoprix 장메드생",cat:"shop",lat:43.7024,lng:7.2671,hours:"월~토 08:00~20:45 / 일 09:00~20:15",price:"생수·간식·식료품",tip:"시내 가장 큰 슈퍼.",map_q:"MONOPRIX 42 Avenue Jean Medecin Nice"},
+  {name:"Carrefour City 클레망소",cat:"shop",lat:43.7024,lng:7.2664,hours:"매일 07:00~22:00",price:"생수·간식",tip:"",map_q:"Carrefour City 1 Avenue Georges Clemenceau Nice"},
+  {name:"Carrefour City 레팡트",cat:"shop",lat:43.7035,lng:7.2707,hours:"매일 07:00~22:00",price:"생수·간식",tip:"",map_q:"Carrefour City Nice Lepante 8 Rue de Lepante"},
+  {name:"Monoprix 니스역",cat:"shop",lat:43.7052,lng:7.2643,hours:"월~토 07:00~22:00 / 일 10:00~20:00",price:"생수·간식",tip:"기차역 바로 옆.",map_q:"MONOPRIX 1 Avenue Thiers Nice"},
+  {name:"Carrefour Market 모나코 ⭐",cat:"shop",lat:43.7353,lng:7.4210,hours:"24시간",price:"생수·간식·식료품",tip:"24시간 오픈! 모나코 최고 슈퍼.",map_q:"Carrefour Market Monaco 17 Boulevard Albert 1er Monaco"},
+  {name:"U Market 모나코",cat:"shop",lat:43.7416,lng:7.4259,hours:"월~토 08:30~20:00",price:"생수·간식",tip:"일요일 휴무.",map_q:"U Market Monaco 30 Boulevard Princesse Charlotte Monaco"},
+  {name:"Carrefour 퐁비에이유",cat:"shop",lat:43.7308,lng:7.4171,hours:"월~토 08:00~21:00 / 일 09:00~19:00",price:"생수·간식·식료품",tip:"모나코 가장 큰 슈퍼.",map_q:"Carrefour Monaco Centre Commercial Fontvieille Monaco"},
+  {name:"Monoprix 칸",cat:"shop",lat:43.5533,lng:7.0185,hours:"월~토 08:00~20:30 / 일 09:00~19:40",price:"생수·간식",tip:"",map_q:"MONOPRIX Cannes 9 Rue du Marechal Foch"},
+  {name:"Monop' 포르빌",cat:"shop",lat:43.5522,lng:7.0114,hours:"매일 08:30~19:00",price:"생수·간식",tip:"포르빌 마켓 옆.",map_q:"Monop' 3 Rue du Marche Forville Cannes"},
+  {name:"Carrefour City 앙티브",cat:"shop",lat:43.5810,lng:7.1242,hours:"매일 07:00~22:00",price:"생수·간식",tip:"",map_q:"Carrefour City 44 Rue de la Republique Antibes"},
+  {name:"La Casa Market 앙티브",cat:"shop",lat:43.5798,lng:7.1269,hours:"매일 14:00~04:00",price:"생수·간식·맥주",tip:"새벽 4시까지! 구시가지 내.",map_q:"La Casa Market 10 Rue de la Tourraque Antibes"},
+  {name:"샤토 언덕 전망대",cat:"spot",lat:43.6959,lng:7.2797,hours:"매일 08:30~20:00",price:"무료",tip:"무료 엘리베이터.",map_q:"Colline du Chateau Nice Castle Hill elevator"},
+  {name:"Villa Masséna 박물관",cat:"spot",lat:43.6954,lng:7.2589,hours:"매일 10:00~18:00",price:"무료입장",tip:"",map_q:"Villa Massena Museum Nice"},
+  {name:"Marc Chagall 국립미술관 ⭐",cat:"spot",lat:43.7095,lng:7.2702,hours:"수~월 10:00~18:00",price:"€10",tip:"화요일 휴무.",map_q:"Marc Chagall National Museum Nice France"},
+  {name:"마티스 미술관",cat:"spot",lat:43.7176,lng:7.2727,hours:"수~월 10:00~18:00",price:"무료입장",tip:"화요일 휴무.",map_q:"Matisse Museum Nice Cimiez"},
+  {name:"쿠르 살레야 마켓",cat:"spot",lat:43.6960,lng:7.2750,hours:"화~일 06:00~13:00",price:"무료",tip:"월요일 휴무. 일요일 벼룩시장.",map_q:"Cours Saleya Market Nice Old Town"},
+  {name:"아시안 아트 뮤지엄",cat:"spot",lat:43.6681,lng:7.2161,hours:"화~일 10:00~18:00",price:"무료입장",tip:"월요일 휴무.",map_q:"Asian Arts Museum Nice 405 Promenade des Anglais"},
+  {name:"몽 보롱 전망대",cat:"spot",lat:43.6965,lng:7.2974,hours:"24시간",price:"무료",tip:"택시 추천.",map_q:"Panorama Mont Boron Nice"},
+  {name:"Casino de Monte-Carlo",cat:"spot",lat:43.7391,lng:7.4281,hours:"매일 14:00~새벽",price:"입장 €17",tip:"여권·스마트캐주얼 필수.",map_q:"Casino de Monte Carlo Monaco Place du Casino"},
+  {name:"모나코 왕궁",cat:"spot",lat:43.7311,lng:7.4203,hours:"매일 10:00~18:00",price:"€10",tip:"11:55 근위대 교대식.",map_q:"Prince Palace Monaco Rock of Monaco"},
+  {name:"해양박물관",cat:"spot",lat:43.7308,lng:7.4256,hours:"매일 10:00~18:00",price:"€22",tip:"온라인 예매 추천.",map_q:"Oceanographic Museum Monaco Albert 1er"},
+  {name:"모나코 파노라마 전망대",cat:"spot",lat:43.7318,lng:7.4236,hours:"24시간",price:"무료",tip:"왕궁 옆. 야경 명소.",map_q:"Panoramic View Monaco 32 Rue des Remparts"},
+  {name:"팔레 드 페스티발 칸",cat:"spot",lat:43.5508,lng:7.0180,hours:"24시간 (외부)",price:"무료",tip:"레드카펫 계단.",map_q:"Palais des Festivals Cannes Boulevard de la Croisette"},
+  {name:"르 쉬케 언덕",cat:"spot",lat:43.5510,lng:7.0105,hours:"24시간",price:"무료",tip:"칸 파노라마 뷰.",map_q:"Le Suquet Old Town Cannes"},
+  {name:"피카소 미술관 앙티브",cat:"spot",lat:43.5804,lng:7.1270,hours:"화~일 10:00~18:00",price:"€8",tip:"월요일 휴무.",map_q:"Musee Picasso Antibes France"},
+  {name:"포르 카레 앙티브",cat:"spot",lat:43.5901,lng:7.1274,hours:"화~일 10:00~18:00",price:"€5",tip:"월요일 휴무.",map_q:"Fort Carre Antibes France"},
+  {name:"에즈 마을 ⭐⭐",cat:"spot",lat:43.7278,lng:7.3617,hours:"24시간",price:"무료",tip:"택시 25분.",map_q:"Eze Village France hilltop medieval"},
+  {name:"테트 드 시앙 ⭐⭐",cat:"spot",lat:43.7307,lng:7.4021,hours:"24시간",price:"무료",tip:"택시 대절. 모나코 전체 뷰.",map_q:"Tete de Chien La Turbie France Monaco viewpoint"},
+  {name:"Le bistrot des docks ⭐",cat:"food",lat:43.7103,lng:7.2626,hours:"화~토 08:00~15:00 / 목~토 19:00~22:30",price:"€35~55/1인",tip:"월·일 휴무. 평점 4.9. 예약 추천.",map_q:"Le bistrot des docks 2 Rue Flaminius Raiberti Nice"},
+  {name:"Bistrot Gourmand",cat:"food",lat:43.6960,lng:7.2699,hours:"매일 12:00~15:00, 19:00~23:00",price:"€25~45/1인",tip:"해변 뷰. 매일 오픈.",map_q:"Bistrot Gourmand 3 Rue Desboutin Nice"},
+  {name:"Le Bistrot du Fromager",cat:"food",lat:43.6965,lng:7.2770,hours:"월~수·금~일 12:00~23:30",price:"€20~35/1인",tip:"목요일 휴무. 치즈·샤퀴테리 전문.",map_q:"Le Bistrot du Fromager 37 Rue Droite Nice"},
+  {name:"Bistrot d'Antoine",cat:"food",lat:43.6964,lng:7.2763,hours:"화~토 12:00~14:00, 19:00~21:30",price:"€30~50/1인",tip:"월·일 휴무. 예약 필수.",map_q:"Bistrot d'Antoine 27 Rue de la Prefecture Nice"},
+  {name:"Le Bistrot de Gillou",cat:"food",lat:43.7010,lng:7.2712,hours:"월~금 12:00~14:00 / 목~토 19:00~21:00",price:"€20~35/1인",tip:"토·일 저녁 휴무.",map_q:"Le Bistrot de Gillou 30 Rue Alberti Nice"},
+  {name:"Le Bistrot du Port",cat:"food",lat:43.6948,lng:7.2829,hours:"월·목~일 12:15~13:45 / 목~일 19:45~21:45",price:"€35~60/1인",tip:"화·수 휴무. 항구 뷰. 예약 추천.",map_q:"Le Bistrot du Port 28 Quai Lunel Nice"},
+  {name:"Le Bistrot de Jeff",cat:"food",lat:43.7006,lng:7.2714,hours:"매일 11:45~14:15 / 화~금 18:00~21:00",price:"€20~35/1인",tip:"일요일 저녁 휴무. 덕 콩피 강추.",map_q:"le bistrot de jeff 26 Rue Alberti Nice"},
+  {name:"Le Bistrot de JAN",cat:"food",lat:43.6998,lng:7.2848,hours:"화~토 12:00~15:00, 19:00~00:30 / 일 12:00~15:00",price:"€30~50/1인",tip:"월요일 휴무. 평점 4.7.",map_q:"Le Bistrot De JAN Nice 12 Rue Lascaris Nice"},
+  {name:"La Langouste",cat:"food",lat:43.7019,lng:7.2654,hours:"매일 12:00~14:00, 19:00~00:00",price:"€35~70/1인",tip:"일요일 휴무. 해산물 전문. 랍스터 강추.",map_q:"La Langouste 7 Avenue Georges Clemenceau Nice"},
+  {name:"La Vague ⭐",cat:"food",lat:43.6967,lng:7.2619,hours:"월·화·목~일 11:45~14:00, 18:00~22:30",price:"€30~50/1인",tip:"수요일 휴무. 평점 4.7. 부야베스 강추.",map_q:"La Vague 8 Rue Dalpozzo Nice"},
+  {name:"Peixes",cat:"food",lat:43.6960,lng:7.2710,hours:"매일 12:00~22:00",price:"€25~45/1인",tip:"일요일 저녁만. 해산물 특선.",map_q:"Peixes 4 Rue Jacques Medecin Nice"},
+  {name:"Les Bains du Castel",cat:"food",lat:43.6938,lng:7.2789,hours:"매일 12:00~21:30",price:"€45~80/1인",tip:"절벽 아래 해변 뷰. 랍스터 강추. 예약 필수.",map_q:"Les Bains du Castel 8 Quai des Etats-Unis Nice"},
+  {name:"Pesca Seafood Restaurant",cat:"food",lat:43.7051,lng:7.2634,hours:"매일 12:00~14:30, 18:30~22:00",price:"€30~60/1인",tip:"당일 생선 시장 컨셉. 평점 4.4.",map_q:"Pesca Seafood Restaurant 8 Avenue Thiers Nice"},
+  {name:"Brasserie Artisanale de Nice",cat:"beer",lat:43.7093,lng:7.2641,hours:"월~토 16:00~19:00 / 토 10:00~12:00",price:"€4~7/잔",tip:"일요일 휴무. 소규모 양조장. 병맥주 위주.",map_q:"Brasserie Artisanale de Nice 14 Avenue Villermont Nice"},
+  {name:"Blue Coast Brewing Company",cat:"beer",lat:43.7210,lng:7.1969,hours:"월~금 12:00~20:00 / 목~금 12:00~22:00",price:"€5~8/잔",tip:"토·일 휴무. 크래프트 양조장 투어 가능.",map_q:"Blue Coast Brewing Company 18 Chemin de Saquier Nice"},
+  {name:"L'Affable",cat:"food",lat:43.5520,lng:7.0249,hours:"화~토 12:00~14:00, 19:00~22:00",price:"€30~50/1인",tip:"월·일 휴무. 버섯 리조토·비프 뺨살 강추.",map_q:"L'Affable 5 Rue la Fontaine Cannes"},
+  {name:"Sens Restaurant Cannes",cat:"food",lat:43.5524,lng:7.0272,hours:"목 19:00~22:30 / 금 12:00~14:30 19:00~22:30 / 토 19:00~22:30",price:"€40~65/1인",tip:"월~수·일 휴무. 평점 4.7. 예약 필수.",map_q:"Sens Restaurant 9 Rue d'Oran Cannes"},
+  {name:"La Brouette de Grand-Mère",cat:"food",lat:43.5512,lng:7.0096,hours:"월·화·금~토 09:00~23:30",price:"€25~40/1인",tip:"수·목·일 휴무. 40년 된 전통 프렌치.",map_q:"La Brouette de Grand Mere 3 Rue du Pre Cannes"},
+  {name:"Black Sails – Pirate Tavern ⭐",cat:"food",lat:43.5491,lng:7.0114,hours:"수~일 18:00~22:00",price:"€25~45/1인",tip:"월·화 휴무. 평점 4.9. 예약 권장.",map_q:"Black Sails Pirate Tavern 39 Rue Georges Clemenceau Cannes"},
+  {name:"Ma Nolan's Irish Pub 칸",cat:"beer",lat:43.5521,lng:7.0182,hours:"매일 11:00~02:00",price:"€5~9/잔",tip:"라이브 뮤직. 영어 완벽.",map_q:"Ma Nolan's Irish Pub 6 Rue Buttura Cannes"},
+  {name:"Morrisons Irish Pub 칸",cat:"beer",lat:43.5529,lng:7.0233,hours:"월~금 17:00~02:30 / 토~일 13:00~02:30",price:"€5~9/잔",tip:"평점 4.4. 라이브 뮤직.",map_q:"Morrisons Irish Pub 10 Rue Teisseire Cannes"},
+  {name:"Barrel Pub 칸",cat:"beer",lat:43.5508,lng:7.0236,hours:"매일 18:00~05:00",price:"€6~10/잔",tip:"새벽 5시까지. 당구대·다트.",map_q:"Barrel Pub 17 Rue Gerard Monod Cannes"},
+  {name:"Byron Pub 칸",cat:"beer",lat:43.5522,lng:7.0142,hours:"화~일 09:30~02:30",price:"€5~8/잔",tip:"월 15:30~. 음식도 됨.",map_q:"Byron 49 Rue Felix Faure Cannes"},
+  {name:"La Taille de Guêpe ⭐",cat:"food",lat:43.5803,lng:7.1250,hours:"수~토 12:00~14:00, 19:00~21:30",price:"€35~55/1인",tip:"월·화·일 휴무. 평점 4.8. 예약 3~5일 전.",map_q:"La Taille de Guepe 24 Rue de Fersen Antibes"},
+  {name:"la petite escale ⭐",cat:"food",lat:43.5799,lng:7.1230,hours:"불규칙 영업",price:"€30~50/1인",tip:"SNS 영업시간 확인 필수. 예약 필수. 평점 4.9.",map_q:"la petite escale 30 Rue Fourmilliere Antibes"},
+  {name:"Le P'tit Cageot",cat:"food",lat:43.5816,lng:7.1247,hours:"월~화 18:30~22:00 / 수~토 12:00~14:00, 18:30~22:00",price:"€25~45/1인",tip:"일요일 휴무. 코크 오뱅 강추. 평점 4.6.",map_q:"Le P'tit Cageot 5 Rue du Dr Rostan Antibes"},
+  {name:"La Cafetière Fêlée ⭐",cat:"food",lat:43.5807,lng:7.1247,hours:"화~금 12:00~13:30, 19:30~21:30",price:"€40~65/1인",tip:"토·일·월 휴무. 2주 전 예약 필수. 평점 4.8.",map_q:"Restaurant La Cafetiere Felee 18 Rue du Marc Antibes"},
+  {name:"Restaurant L'Arazur",cat:"food",lat:43.5819,lng:7.1275,hours:"월~토 19:00~23:00",price:"€45~70/1인",tip:"일요일 휴무. 5코스 테이스팅. 평점 4.6.",map_q:"Restaurant L'Arazur 8 Rue des Palmiers Antibes"},
+  {name:"Bistro & Co. RoofTop",cat:"food",lat:43.6095,lng:7.1254,hours:"매일 12:00~00:00",price:"€20~35/1인",tip:"루프탑 뷰. 평점 4.6.",map_q:"Bistro Co RoofTop Bar Restaurant Antibes"}
+]
+
+
+let nearbyCurrentFilter = 'all';
+let userLat = null, userLng = null;
+
+function calcDist(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function minsWalk(meters) {
+  const mins = Math.round(meters / 80);
+  if (mins < 1) return '1분 미만';
+  if (mins > 60) return Math.round(mins/10)*10 + '분+';
+  return mins + '분';
+}
+
+function catIcon(cat) {
+  return {cafe:'☕', beer:'🍺', food:'🍽', spot:'🏛', shop:'🛒'}[cat] || '📍';
+}
+
+function filterNearby(cat) {
+  nearbyCurrentFilter = cat;
+  document.querySelectorAll('#nearbyFilters .ftab').forEach((t,i) => {
+    const cats = ['all','cafe','beer','food','spot','shop'];
+    t.className = cats[i] === cat ? 'ftab on' : 'ftab';
+  });
+  renderNearby();
+}
+
+function renderNearby() {
+  const list = document.getElementById('nearbyList');
+  const status = document.getElementById('nearbyStatus');
+  if (!userLat) return;
+  status.style.display = 'none';
+
+  let places = NEARBY_PLACES
+    .filter(p => nearbyCurrentFilter === 'all' || p.cat === nearbyCurrentFilter)
+    .map(p => ({...p, dist: calcDist(userLat, userLng, p.lat, p.lng)}))
+    .sort((a,b) => a.dist - b.dist);
+
+  if (places.length === 0) {
+    const countEl2 = document.getElementById('nearbyCount');
+    if (countEl2) countEl2.textContent = '(0개)';
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">해당 카테고리 장소가 없습니다.</div>';
+    return;
+  }
+
+  const countEl = document.getElementById('nearbyCount');
+  if (countEl) countEl.textContent = '(' + places.length + '개)';
+
+  list.innerHTML = places.map(function(p) {
+    var tip = p.tip ? '<div class="mr"><span class="mt">💡 ' + p.tip + '</' + 'span></' + 'div>' : '';
+    var html = '';
+    html += '<div class="card">';
+    html += '<div class="card-top">';
+    html += '<div class="ci">' + catIcon(p.cat) + '</' + 'div>';
+    html += '<div class="cb">';
+    html += '<div class="cn">' + p.name + '</' + 'div>';
+    html += '<div class="cd">' + p.desc + '</' + 'div>';
+    html += '</' + 'div>';
+    html += '<div style="flex-shrink:0;text-align:right;padding-left:8px;">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--teal);">🚶 ' + minsWalk(p.dist) + '</' + 'div>';
+    html += '<div style="font-size:10px;color:var(--text3);margin-top:2px;">' + Math.round(p.dist) + 'm</' + 'div>';
+    html += '</' + 'div>';
+    html += '</' + 'div>';
+    html += '<div class="meta"><div class="mr">';
+    html += '<span class="mh">🕐 ' + p.hours + '</' + 'span>';
+    html += '<span class="mp">💶 ' + p.price + '</' + 'span>';
+    html += '</' + 'div>' + tip + '</' + 'div>';
+    html += '<div class="btns">';
+    html += '<div class="bm" onclick="gm(\'' + p.map_q.replace(/'/g,"\\'") + '\')"><span>📍 위치</' + 'span></' + 'div>';
+    html += '<div class="bu" onclick="ub(' + p.lat + ',' + p.lng + ',\'' + p.name.replace(/'/g,"\\'") + '\')"><span>🚗 우버</' + 'span></' + 'div>';
+    html += '</' + 'div>';
+    html += '</' + 'div>';
+    return html;
+  }).join('');
+}
+
+function loadNearby() {
+  const status = document.getElementById('nearbyStatus');
+  if (!navigator.geolocation) {
+    status.textContent = '⚠️ 이 기기는 위치 서비스를 지원하지 않아요.';
+    return;
+  }
+  status.textContent = '📡 위치 확인 중...';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      userLat = pos.coords.latitude;
+      userLng = pos.coords.longitude;
+      renderNearby();
+    },
+    err => {
+      status.textContent = '⚠️ 위치 권한을 허용해 주세요.';
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+</script>
+</body>
+</html>
